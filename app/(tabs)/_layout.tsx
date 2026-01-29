@@ -6,15 +6,33 @@ export default function TabsLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: "#007bff",
-        tabBarStyle: { height: 60, paddingBottom: 5 },
+
+        // 🎨 Colors
+        tabBarActiveTintColor: "#38bdf8", // light blue
+        tabBarInactiveTintColor: "#64748b",
+
+        // 🌙 Dark tab bar
+        tabBarStyle: {
+          backgroundColor: "#020617",
+          borderTopColor: "#0f172a",
+          borderTopWidth: 1,
+          height: 64,
+          paddingBottom: 8,
+          paddingTop: 6,
+        },
+
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: "600",
+        },
       }}
     >
       <Tabs.Screen
         name="home"
         options={{
+          title: "Home",
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="home" size={size} color={color} />
+            <Ionicons name="home-outline" size={size} color={color} />
           ),
         }}
       />
@@ -22,8 +40,9 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="profile"
         options={{
+          title: "Profile",
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="person" size={size} color={color} />
+            <Ionicons name="person-outline" size={size} color={color} />
           ),
         }}
       />
@@ -31,8 +50,9 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="settings"
         options={{
+          title: "Settings",
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="settings" size={size} color={color} />
+            <Ionicons name="settings-outline" size={size} color={color} />
           ),
         }}
       />

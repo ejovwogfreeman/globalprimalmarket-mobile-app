@@ -1,9 +1,306 @@
-import { Text, View } from "react-native";
+import { StatusBar } from "expo-status-bar";
+import {
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 export default function Home() {
   return (
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text style={{ fontSize: 24 }}>Home Screen</Text>
+    <SafeAreaView style={styles.safe}>
+      <StatusBar style="light" />
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.container}
+      >
+        {/* Header */}
+        <View style={styles.header}>
+          <View>
+            <Text style={styles.welcome}>Good morning 👋</Text>
+            <Text style={styles.name}>Godbless</Text>
+          </View>
+
+          <TouchableOpacity style={styles.profile}>
+            <Text style={styles.profileText}>G</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Balance Card */}
+        <View style={styles.balanceCard}>
+          <Text style={styles.balanceLabel}>Total Portfolio Value</Text>
+          <Text style={styles.balance}>$18,920.45</Text>
+
+          <View style={styles.balanceRow}>
+            <Text style={styles.profit}>+3.12%</Text>
+            <Text style={styles.profitText}>Today</Text>
+          </View>
+        </View>
+
+        {/* Actions */}
+        <View style={styles.actions}>
+          <ActionButton title="Send" />
+          <ActionButton title="Receive" />
+          <ActionButton title="Buy" />
+          <ActionButton title="Swap" />
+        </View>
+
+        {/* Portfolio */}
+        <SectionTitle title="Portfolio" />
+
+        <CryptoItem
+          name="Bitcoin"
+          symbol="BTC"
+          price="$42,120"
+          change="+2.4%"
+        />
+        <CryptoItem
+          name="Ethereum"
+          symbol="ETH"
+          price="$2,310"
+          change="-0.8%"
+          negative
+        />
+        <CryptoItem name="Solana" symbol="SOL" price="$98.40" change="+5.1%" />
+
+        {/* Market Movers */}
+        <SectionTitle title="Top Movers" />
+
+        <MoverItem name="DOGE" change="+12.5%" />
+        <MoverItem name="AVAX" change="+8.2%" />
+        <MoverItem name="ADA" change="-3.1%" negative />
+
+        {/* Transactions */}
+        <SectionTitle title="Recent Activity" />
+
+        <TransactionItem
+          title="Sent Bitcoin"
+          amount="-0.002 BTC"
+          date="Today"
+          negative
+        />
+        <TransactionItem
+          title="Received ETH"
+          amount="+0.45 ETH"
+          date="Yesterday"
+        />
+        <TransactionItem title="Bought SOL" amount="+12 SOL" date="Jan 26" />
+
+        {/* News */}
+        <SectionTitle title="Crypto News" />
+
+        <NewsItem title="Bitcoin hits new resistance at $43k" />
+        <NewsItem title="Ethereum gas fees drop by 18%" />
+
+        {/* Bottom Spacing */}
+        <View style={{ height: 30 }} />
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
+/* 🔹 Reusable Components */
+
+function SectionTitle({ title }) {
+  return <Text style={styles.sectionTitle}>{title}</Text>;
+}
+
+function ActionButton({ title }) {
+  return (
+    <TouchableOpacity style={styles.actionBtn}>
+      <Text style={styles.actionText}>{title}</Text>
+    </TouchableOpacity>
+  );
+}
+
+function CryptoItem({ name, symbol, price, change, negative }) {
+  return (
+    <View style={styles.listItem}>
+      <View>
+        <Text style={styles.listTitle}>{name}</Text>
+        <Text style={styles.listSub}>{symbol}</Text>
+      </View>
+      <View style={{ alignItems: "flex-end" }}>
+        <Text style={styles.listValue}>{price}</Text>
+        <Text
+          style={[styles.change, { color: negative ? "#ef4444" : "#22c55e" }]}
+        >
+          {change}
+        </Text>
+      </View>
     </View>
   );
 }
+
+function MoverItem({ name, change, negative }) {
+  return (
+    <View style={styles.moverItem}>
+      <Text style={styles.listTitle}>{name}</Text>
+      <Text
+        style={[styles.change, { color: negative ? "#ef4444" : "#22c55e" }]}
+      >
+        {change}
+      </Text>
+    </View>
+  );
+}
+
+function TransactionItem({ title, amount, date, negative }) {
+  return (
+    <View style={styles.listItem}>
+      <View>
+        <Text style={styles.listTitle}>{title}</Text>
+        <Text style={styles.listSub}>{date}</Text>
+      </View>
+      <Text
+        style={[styles.listValue, { color: negative ? "#ef4444" : "#22c55e" }]}
+      >
+        {amount}
+      </Text>
+    </View>
+  );
+}
+
+function NewsItem({ title }) {
+  return (
+    <View style={styles.newsItem}>
+      <Text style={styles.newsText}>{title}</Text>
+    </View>
+  );
+}
+
+/* 🎨 Styles */
+const styles = StyleSheet.create({
+  safe: {
+    flex: 1,
+    backgroundColor: "#020617",
+  },
+  container: {
+    padding: 20,
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  welcome: {
+    color: "#94a3b8",
+    fontSize: 14,
+  },
+  name: {
+    color: "#f8fafc",
+    fontSize: 22,
+    fontWeight: "700",
+  },
+  profile: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#1e293b",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  profileText: {
+    color: "#38bdf8",
+    fontWeight: "700",
+  },
+  balanceCard: {
+    backgroundColor: "#0f172a",
+    borderRadius: 18,
+    padding: 20,
+    marginBottom: 24,
+  },
+  balanceLabel: {
+    color: "#94a3b8",
+  },
+  balance: {
+    color: "#f8fafc",
+    fontSize: 32,
+    fontWeight: "700",
+    marginVertical: 8,
+  },
+  balanceRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  profit: {
+    color: "#22c55e",
+    fontWeight: "600",
+    marginRight: 6,
+  },
+  profitText: {
+    color: "#94a3b8",
+  },
+  actions: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    marginBottom: 30,
+  },
+  actionBtn: {
+    backgroundColor: "#1e293b",
+    width: "48%",
+    paddingVertical: 14,
+    borderRadius: 14,
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  actionText: {
+    color: "#38bdf8",
+    fontWeight: "600",
+  },
+  sectionTitle: {
+    color: "#f8fafc",
+    fontSize: 18,
+    fontWeight: "600",
+    marginBottom: 12,
+    marginTop: 10,
+  },
+  listItem: {
+    backgroundColor: "#0f172a",
+    borderRadius: 14,
+    padding: 16,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 12,
+  },
+  moverItem: {
+    backgroundColor: "#0f172a",
+    borderRadius: 14,
+    padding: 16,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 12,
+  },
+  listTitle: {
+    color: "#f8fafc",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  listSub: {
+    color: "#94a3b8",
+    fontSize: 12,
+  },
+  listValue: {
+    color: "#f8fafc",
+    fontWeight: "600",
+  },
+  change: {
+    fontSize: 12,
+    marginTop: 4,
+  },
+  newsItem: {
+    backgroundColor: "#0f172a",
+    borderRadius: 14,
+    padding: 16,
+    marginBottom: 12,
+  },
+  newsText: {
+    color: "#e5e7eb",
+    fontSize: 14,
+  },
+});
