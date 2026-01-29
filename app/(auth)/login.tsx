@@ -53,7 +53,7 @@ export default function Login() {
       {/* Footer */}
       <View style={styles.footer}>
         <Text style={styles.footerText}> Don’t have an account?</Text>
-        <TouchableOpacity onPress={() => router.replace("/signup/step1")}>
+        <TouchableOpacity onPress={() => router.push("/signup/step1")}>
           <Text style={styles.link}>Sign Up</Text>
         </TouchableOpacity>
       </View>
