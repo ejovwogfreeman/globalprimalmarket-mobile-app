@@ -1,4 +1,11 @@
-export const COUNTRIES = [
+// ✅ Type definition for a country
+export type Country = {
+  name: string;
+  flag: string;
+};
+
+// ✅ Typed array of countries
+export const COUNTRIES: Country[] = [
   { name: "Afghanistan", flag: "🇦🇫" },
   { name: "Albania", flag: "🇦🇱" },
   { name: "Algeria", flag: "🇩🇿" },

@@ -1,7 +1,114 @@
+// import { useRouter } from "expo-router";
+// import { StatusBar } from "expo-status-bar";
+// import { useState } from "react";
+// import {
+//   SafeAreaView,
+//   ScrollView,
+//   StyleSheet,
+//   Text,
+//   TextInput,
+//   TextStyle,
+//   TouchableOpacity,
+//   View,
+//   ViewStyle,
+// } from "react-native";
+// import { useSignUp } from "../../../context/SignUpContext";
+
+// export default function Step1() {
+//   const router = useRouter();
+
+//   const { updateSignUpData } = useSignUp();
+
+//   const [form, setForm] = useState({
+//     userName: "",
+//     fullName: "",
+//     email: "",
+//     phoneNumber: "",
+//   });
+
+//   return (
+//     <SafeAreaView style={styles.safe}>
+//       <StatusBar style="light" />
+
+//       <ScrollView
+//         showsVerticalScrollIndicator={false}
+//         contentContainerStyle={styles.scroll}
+//       >
+//         <View style={styles.container}>
+//           {/* Progress */}
+//           <View style={styles.progress}>
+//             <Text style={styles.step}>1/3</Text>
+//           </View>
+
+//           <Text style={styles.title}>Create Account</Text>
+//           <Text style={styles.subtitle}>Open your crypto trading account</Text>
+
+//           <Text style={styles.label}>Trading Username *</Text>
+//           <TextInput
+//             placeholder="Choose username"
+//             placeholderTextColor="#64748b"
+//             style={styles.input}
+//             value={form.userName}
+//             onChangeText={(t) => setForm({ ...form, userName: t })}
+//           />
+
+//           <Text style={styles.label}>Full Name *</Text>
+//           <TextInput
+//             placeholder="Enter full name"
+//             placeholderTextColor="#64748b"
+//             style={styles.input}
+//             value={form.fullName}
+//             onChangeText={(t) => setForm({ ...form, fullName: t })}
+//           />
+
+//           <Text style={styles.label}>Email Address *</Text>
+//           <TextInput
+//             placeholder="your.email@example.com"
+//             placeholderTextColor="#64748b"
+//             keyboardType="email-address"
+//             autoCapitalize="none"
+//             style={styles.input}
+//             value={form.email}
+//             onChangeText={(t) => setForm({ ...form, email: t })}
+//           />
+
+//           <Text style={styles.label}>Phone Number *</Text>
+//           <TextInput
+//             placeholder="+234 812 345 6789"
+//             placeholderTextColor="#64748b"
+//             keyboardType="phone-pad"
+//             style={styles.input}
+//             value={form.phoneNumber}
+//             onChangeText={(t) => setForm({ ...form, phoneNumber: t })}
+//           />
+
+//           <TouchableOpacity
+//             style={styles.button}
+//             onPress={() => {
+//               updateSignUpData(form);
+//               router.push("/signup/step2");
+//             }}
+//           >
+//             <Text style={styles.buttonText}>Continue</Text>
+//           </TouchableOpacity>
+//         </View>
+//         {/* Footer */}
+//         <View style={styles.footer}>
+//           <Text style={styles.footerText}> Already have an account?</Text>
+//           <TouchableOpacity onPress={() => router.back()}>
+//             <Text style={styles.link}>Login</Text>
+//           </TouchableOpacity>
+//         </View>
+//       </ScrollView>
+//     </SafeAreaView>
+//   );
+// }
+
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
+  Alert,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -14,17 +121,56 @@ import {
 } from "react-native";
 import { useSignUp } from "../../../context/SignUpContext";
 
+interface FormData {
+  userName: string;
+  fullName: string;
+  email: string;
+  phoneNumber: string;
+}
+
 export default function Step1() {
   const router = useRouter();
-
   const { updateSignUpData } = useSignUp();
 
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<FormData>({
     userName: "",
     fullName: "",
     email: "",
     phoneNumber: "",
   });
+
+  const [isValid, setIsValid] = useState(false);
+
+  // Check if all fields are filled
+  const checkFieldsFilled = () => {
+    return (
+      form.userName.trim() !== "" &&
+      form.fullName.trim() !== "" &&
+      form.email.trim() !== "" &&
+      form.phoneNumber.trim() !== ""
+    );
+  };
+
+  // Update isValid whenever form changes
+  useEffect(() => {
+    setIsValid(checkFieldsFilled());
+  }, [form]);
+
+  const handleContinue = () => {
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(form.email)) {
+      Alert.alert(
+        "Invalid Email",
+        "Please enter a valid email address, e.g., example@email.com",
+      );
+      return;
+    }
+
+    // All good, save data and navigate
+    updateSignUpData(form);
+    router.push("/signup/step2");
+  };
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -83,15 +229,14 @@ export default function Step1() {
           />
 
           <TouchableOpacity
-            style={styles.button}
-            onPress={() => {
-              updateSignUpData(form);
-              router.push("/signup/step2");
-            }}
+            style={[styles.button, { opacity: isValid ? 1 : 0.5 }]}
+            onPress={handleContinue}
+            disabled={!isValid}
           >
             <Text style={styles.buttonText}>Continue</Text>
           </TouchableOpacity>
         </View>
+
         {/* Footer */}
         <View style={styles.footer}>
           <Text style={styles.footerText}> Already have an account?</Text>

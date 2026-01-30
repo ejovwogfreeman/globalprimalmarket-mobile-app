@@ -1,7 +1,8 @@
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
+  Alert,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -13,33 +14,74 @@ import {
   ViewStyle,
 } from "react-native";
 import { useSignUp } from "../../../context/SignUpContext";
+import { RegisterData, registerUser } from "../../../data/api"; // your API
 
 export default function Step3() {
   const router = useRouter();
   const { signUpData, updateSignUpData } = useSignUp();
-  const [password, setPassword] = useState("");
-  const [confirm, setConfirm] = useState("");
 
-  const handleSignup = () => {
-    if (password !== confirm) return;
+  const [password, setPassword] = useState(signUpData.password || "");
+  const [confirm, setConfirm] = useState(signUpData.password || "");
+  const [loading, setLoading] = useState(false);
+  const [isFilled, setIsFilled] = useState(false);
 
-    updateSignUpData({ password });
+  // ✅ Check if both password fields are filled
+  useEffect(() => {
+    setIsFilled(password.trim() !== "" && confirm.trim() !== "");
+  }, [password, confirm]);
 
-    console.log("FINAL SIGNUP DATA:", {
-      ...signUpData,
-      password,
-    });
+  const handleSignup = async () => {
+    // ✅ Check password length
+    if (password.length < 8) {
+      Alert.alert(
+        "Weak Password",
+        "Password must be at least 8 characters long.",
+      );
+      return;
+    }
 
-    // 🔥 Send everything to your API here
-    // fetch("/signup", { body: JSON.stringify(...) })
+    // ✅ Check password match
+    if (password !== confirm) {
+      Alert.alert(
+        "Passwords do not match",
+        "Please make sure both passwords are the same.",
+      );
+      return;
+    }
 
-    router.replace("/verify");
+    setLoading(true);
+
+    const finalData: RegisterData = {
+      userName: signUpData.userName,
+      fullName: signUpData.fullName,
+      email: signUpData.email,
+      phoneNumber: signUpData.phoneNumber,
+      country: signUpData.country,
+      password: password, // use typed password
+    };
+
+    try {
+      console.warn("SignUpData:", signUpData);
+
+      const res = await registerUser(finalData);
+
+      if (res.success) {
+        updateSignUpData({ password });
+        Alert.alert("Registration Successful", res.message);
+        router.replace("/verify");
+      } else {
+        Alert.alert("Registration Failed", res.message);
+      }
+    } catch (error: any) {
+      Alert.alert("Error", error.message || "Something went wrong.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <SafeAreaView style={styles.safe}>
       <StatusBar style="light" />
-
       <ScrollView contentContainerStyle={styles.scroll}>
         <View style={styles.container}>
           {/* Progress */}
@@ -57,10 +99,7 @@ export default function Step3() {
             secureTextEntry
             style={styles.input}
             value={password}
-            onChangeText={(text) => {
-              setPassword(text);
-              updateSignUpData({ password: text });
-            }}
+            onChangeText={(text) => setPassword(text)}
           />
 
           <Text style={styles.label}>Confirm Password *</Text>
@@ -74,12 +113,15 @@ export default function Step3() {
           />
 
           <TouchableOpacity
-            style={styles.button}
-            // onPress={() => router.replace("/verify")}
+            style={[styles.button, { opacity: isFilled ? 1 : 0.5 }]}
             onPress={handleSignup}
+            disabled={!isFilled || loading}
           >
-            <Text style={styles.buttonText}>Create Account</Text>
+            <Text style={styles.buttonText}>
+              {loading ? "Creating Account..." : "Create Account"}
+            </Text>
           </TouchableOpacity>
+
           {/* Footer */}
           <View style={styles.footer}>
             <TouchableOpacity onPress={() => router.back()}>
