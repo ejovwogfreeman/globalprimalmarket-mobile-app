@@ -11,20 +11,19 @@ import {
   View,
   ViewStyle,
 } from "react-native";
-import { loginUser } from "../../data/api";
+import { forgetPassword } from "../../data/api"; // your API call
 
-export default function Login() {
+export default function ForgetPassword() {
   const router = useRouter();
 
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = async () => {
+  const handleRequest = async () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (!email || !password) {
-      Alert.alert("Missing Fields", "Please enter email and password");
+    if (!email) {
+      Alert.alert("Missing Email", "Please enter your email address");
       return;
     }
 
@@ -34,29 +33,23 @@ export default function Login() {
     }
 
     setLoading(true);
-
     try {
-      const res = await loginUser({ email, password });
+      const res = await forgetPassword({ email }); // call API
 
-      if (res.success && res.user) {
-        if (!res.user.isVerified) {
-          Alert.alert(
-            "Account Not Verified",
-            "Please verify your account to continue.",
-          );
+      if (res.success) {
+        // Show alert first
+        Alert.alert("Success", "Check your email for the code!");
 
-          router.replace({
-            pathname: "/verify",
-            params: { email: res.user.email },
-          });
-        } else {
-          router.replace("/home");
-        }
+        // Navigate to ChangePassword screen
+        router.replace({
+          pathname: "/changepassword",
+          params: { email: email },
+        });
       } else {
-        Alert.alert("Login Failed", res.message);
+        Alert.alert("Error", res.message || "Something went wrong");
       }
-    } catch (error: any) {
-      Alert.alert("Error", error.message || "Something went wrong");
+    } catch (err: any) {
+      Alert.alert("Error", err.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
@@ -66,13 +59,12 @@ export default function Login() {
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
 
-      {/* Title */}
-      <Text style={styles.title}>Welcome Back 👋</Text>
-      <Text style={styles.subtitle}>Login to continue</Text>
+      <Text style={styles.title}>Forgot Password 🔐</Text>
+      <Text style={styles.subtitle}>
+        Enter your email to receive a verification code
+      </Text>
 
-      {/* Card */}
       <View style={styles.card}>
-        {/* Email */}
         <TextInput
           placeholder="Email"
           placeholderTextColor="#9ca3af"
@@ -83,41 +75,19 @@ export default function Login() {
           keyboardType="email-address"
         />
 
-        {/* Password */}
-        <TextInput
-          placeholder="Password"
-          placeholderTextColor="#9ca3af"
-          secureTextEntry
-          style={styles.input}
-          value={password}
-          onChangeText={setPassword}
-        />
-
-        {/* Forgot Password */}
-        <TouchableOpacity
-          style={styles.forgotContainer}
-          onPress={() => router.push("/forgetpassword")}
-        >
-          <Text style={styles.forgotText}>Forgot Password?</Text>
-        </TouchableOpacity>
-
-        {/* Login Button */}
         <TouchableOpacity
           style={styles.button}
-          onPress={handleLogin}
+          onPress={handleRequest}
           disabled={loading}
         >
           <Text style={styles.buttonText}>
-            {loading ? "Logging in..." : "Login"}
+            {loading ? "Sending..." : "Request Change"}
           </Text>
         </TouchableOpacity>
       </View>
-
-      {/* Footer */}
       <View style={styles.footer}>
-        <Text style={styles.footerText}>Don’t have an account?</Text>
-        <TouchableOpacity onPress={() => router.push("/signup/step1")}>
-          <Text style={styles.link}>Sign Up</Text>
+        <TouchableOpacity onPress={() => router.back()}>
+          <Text style={styles.link}>Back</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -130,8 +100,6 @@ type Styles = {
   subtitle: TextStyle;
   card: ViewStyle;
   input: TextStyle;
-  forgotContainer: ViewStyle;
-  forgotText: TextStyle;
   button: ViewStyle;
   buttonText: TextStyle;
   footer: ViewStyle;
@@ -142,7 +110,7 @@ type Styles = {
 const styles = StyleSheet.create<Styles>({
   container: {
     flex: 1,
-    backgroundColor: "#0f172a", // dark navy
+    backgroundColor: "#0f172a",
     justifyContent: "center",
     padding: 24,
   },
@@ -156,6 +124,7 @@ const styles = StyleSheet.create<Styles>({
     fontSize: 14,
     color: "#94a3b8",
     textAlign: "center",
+    marginTop: 10,
     marginBottom: 30,
   },
   card: {
@@ -175,28 +144,15 @@ const styles = StyleSheet.create<Styles>({
     marginBottom: 14,
     fontSize: 16,
   },
-  forgotContainer: {
-    alignItems: "flex-end",
-    marginBottom: 20,
-  },
-  forgotText: {
-    color: "#38bdf8",
-    fontSize: 13,
-  },
   button: {
     backgroundColor: "#2563eb",
     paddingVertical: 14,
     borderRadius: 12,
     alignItems: "center",
   },
-  buttonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
+  buttonText: { color: "#fff", fontSize: 16, fontWeight: "600" },
   footer: {
     flexDirection: "row",
-    justifyContent: "center",
     marginTop: 26,
   },
 

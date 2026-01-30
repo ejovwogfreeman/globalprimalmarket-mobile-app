@@ -38,6 +38,16 @@ export type ResendVerificationData = {
   email: string;
 };
 
+export type ForgetPasswordData = {
+  email: String;
+};
+
+export type ChangePasswordData = {
+  email: String;
+  code: String;
+  newPassword: String;
+};
+
 export type AuthResponse = {
   success: boolean;
   message: string;
@@ -117,6 +127,48 @@ export const resendVerification = async (
   try {
     const response: AxiosResponse<AuthResponse> = await api.post(
       "/auth/resend-verification",
+      data,
+    );
+    return response.data;
+  } catch (error: any) {
+    return {
+      success: false,
+      message:
+        error.response?.data?.message ||
+        error.message ||
+        "Error Sending Verification code",
+    };
+  }
+};
+
+// Forget password (email or OTP)
+export const forgetPassword = async (
+  data: ForgetPasswordData,
+): Promise<AuthResponse> => {
+  try {
+    const response: AxiosResponse<AuthResponse> = await api.post(
+      "/auth/forget-password",
+      data,
+    );
+    return response.data;
+  } catch (error: any) {
+    return {
+      success: false,
+      message:
+        error.response?.data?.message ||
+        error.message ||
+        "Error Sending Verification code",
+    };
+  }
+};
+
+// Change password (email or OTP)
+export const changePassword = async (
+  data: ChangePasswordData,
+): Promise<AuthResponse> => {
+  try {
+    const response: AxiosResponse<AuthResponse> = await api.post(
+      "/auth/change-password",
       data,
     );
     return response.data;
