@@ -6,25 +6,30 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  TextStyle,
   TouchableOpacity,
   View,
+  ViewStyle,
 } from "react-native";
 
 export default function Verify() {
   const router = useRouter();
-  const [code, setCode] = useState(["", "", "", "", "", ""]);
-  const [isVerifying, setIsVerifying] = useState(false);
 
-  const inputsRef = useRef([]);
+  const [code, setCode] = useState<string[]>(["", "", "", "", "", ""]);
+  const [isVerifying, setIsVerifying] = useState<boolean>(false);
+
+  const inputsRef = useRef<Array<TextInput | null>>([]);
+
   const MOCK_CODE = "123456";
 
-  const handleChange = (value, index) => {
+  const handleChange = (value: string, index: number): void => {
     // Allow only numbers
     const num = value.replace(/[^0-9]/g, "");
 
     if (num.length > 1) {
-      // Pasted code (handle 6 digits)
+      // Handle pasted OTP
       const newCode = num.split("").slice(0, 6);
+
       setCode((prev) => {
         const updated = [...prev];
         newCode.forEach((digit, i) => {
@@ -32,9 +37,9 @@ export default function Verify() {
         });
         return updated;
       });
-      // Focus last filled input or blur if complete
+
       const lastIndex = Math.min(newCode.length - 1, 5);
-      inputsRef.current[lastIndex].focus();
+      inputsRef.current[lastIndex]?.focus();
       return;
     }
 
@@ -42,20 +47,23 @@ export default function Verify() {
     newCode[index] = num;
     setCode(newCode);
 
-    // Move focus to next box if filled
     if (num && index < 5) {
-      inputsRef.current[index + 1].focus();
+      inputsRef.current[index + 1]?.focus();
     }
   };
 
-  const handleKeyPress = ({ nativeEvent }, index) => {
-    if (nativeEvent.key === "Backspace" && code[index] === "" && index > 0) {
-      inputsRef.current[index - 1].focus();
+  const handleKeyPress = (
+    e: { nativeEvent: { key: string } },
+    index: number,
+  ): void => {
+    if (e.nativeEvent.key === "Backspace" && code[index] === "" && index > 0) {
+      inputsRef.current[index - 1]?.focus();
     }
   };
 
-  const handleVerify = () => {
+  const handleVerify = (): void => {
     const finalCode = code.join("");
+
     if (finalCode.length !== 6) {
       Alert.alert(
         "Invalid Code",
@@ -68,6 +76,7 @@ export default function Verify() {
 
     setTimeout(() => {
       setIsVerifying(false);
+
       if (finalCode === MOCK_CODE) {
         router.replace("/success");
       } else {
@@ -79,6 +88,7 @@ export default function Verify() {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
+
       <Text style={styles.title}>Enter Verification Code</Text>
       <Text style={styles.subtitle}>
         Please enter the 6-digit code sent to you
@@ -89,13 +99,15 @@ export default function Verify() {
           {code.map((digit, index) => (
             <TextInput
               key={index}
+              ref={(ref: TextInput | null) => {
+                inputsRef.current[index] = ref;
+              }}
               style={styles.otpInput}
               value={digit}
               onChangeText={(val) => handleChange(val, index)}
               onKeyPress={(e) => handleKeyPress(e, index)}
               keyboardType="number-pad"
-              maxLength={6} // allow paste of full code
-              ref={(ref) => (inputsRef.current[index] = ref)}
+              maxLength={6}
               textAlign="center"
             />
           ))}
@@ -115,7 +127,18 @@ export default function Verify() {
   );
 }
 
-const styles = StyleSheet.create({
+type Styles = {
+  container: ViewStyle;
+  title: TextStyle;
+  subtitle: TextStyle;
+  card: ViewStyle;
+  otpContainer: ViewStyle;
+  otpInput: TextStyle;
+  button: ViewStyle;
+  buttonText: TextStyle;
+};
+
+const styles = StyleSheet.create<Styles>({
   container: {
     flex: 1,
     backgroundColor: "#0f172a",

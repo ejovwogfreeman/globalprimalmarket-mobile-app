@@ -4,8 +4,10 @@ import {
   SafeAreaView,
   StyleSheet,
   Text,
+  TextStyle,
   TouchableOpacity,
   View,
+  ViewStyle,
 } from "react-native";
 
 export default function Settings() {
@@ -34,7 +36,11 @@ export default function Settings() {
   );
 }
 
-function SettingsItem({ title }) {
+type SettingsItemProps = {
+  title: string;
+};
+
+function SettingsItem({ title }: SettingsItemProps) {
   return (
     <TouchableOpacity style={styles.item}>
       <Text style={styles.itemText}>{title}</Text>
@@ -42,8 +48,21 @@ function SettingsItem({ title }) {
   );
 }
 
+type Styles = {
+  safe: ViewStyle;
+  container: ViewStyle;
+
+  title: TextStyle;
+
+  item: ViewStyle;
+  itemText: TextStyle;
+
+  logout: ViewStyle;
+  logoutText: TextStyle;
+};
+
 /* 🎨 Styles */
-const styles = StyleSheet.create({
+const styles = StyleSheet.create<Styles>({
   safe: {
     flex: 1,
     backgroundColor: "#020617",

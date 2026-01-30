@@ -3,8 +3,10 @@ import {
   StatusBar,
   StyleSheet,
   Text,
+  TextStyle,
   TouchableOpacity,
   View,
+  ViewStyle,
 } from "react-native";
 
 export default function Success() {
@@ -30,7 +32,16 @@ export default function Success() {
   );
 }
 
-const styles = StyleSheet.create({
+type Styles = {
+  container: ViewStyle;
+  emoji: TextStyle;
+  title: TextStyle;
+  subtitle: TextStyle;
+  button: ViewStyle;
+  buttonText: TextStyle;
+};
+
+const styles = StyleSheet.create<Styles>({
   container: {
     flex: 1,
     backgroundColor: "#0f172a",

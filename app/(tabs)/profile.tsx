@@ -1,16 +1,20 @@
 import { StatusBar } from "expo-status-bar";
+import React from "react";
 import {
   SafeAreaView,
   StyleSheet,
   Text,
+  TextStyle,
   TouchableOpacity,
   View,
+  ViewStyle,
 } from "react-native";
 
 export default function Profile() {
   return (
     <SafeAreaView style={styles.safe}>
       <StatusBar style="light" />
+
       <View style={styles.container}>
         {/* Header */}
         <Text style={styles.title}>Profile</Text>
@@ -40,7 +44,12 @@ export default function Profile() {
   );
 }
 
-function ProfileRow({ label, value }) {
+type ProfileRowProps = {
+  label: string;
+  value: string;
+};
+
+function ProfileRow({ label, value }: ProfileRowProps) {
   return (
     <View style={styles.row}>
       <Text style={styles.rowLabel}>{label}</Text>
@@ -49,8 +58,24 @@ function ProfileRow({ label, value }) {
   );
 }
 
+type Styles = {
+  safe: ViewStyle;
+  container: ViewStyle;
+  title: TextStyle;
+  avatar: ViewStyle;
+  avatarText: TextStyle;
+  name: TextStyle;
+  username: TextStyle;
+  card: ViewStyle;
+  row: ViewStyle;
+  rowLabel: TextStyle;
+  rowValue: TextStyle;
+  button: ViewStyle;
+  buttonText: TextStyle;
+};
+
 /* 🎨 Styles */
-const styles = StyleSheet.create({
+const styles = StyleSheet.create<Styles>({
   safe: {
     flex: 1,
     backgroundColor: "#020617",

@@ -78,7 +78,7 @@ type Styles = {
   link: TextStyle;
 };
 
-export const styles = StyleSheet.create<Styles>({
+const styles = StyleSheet.create<Styles>({
   container: {
     flex: 1,
     backgroundColor: "#0f172a", // dark navy

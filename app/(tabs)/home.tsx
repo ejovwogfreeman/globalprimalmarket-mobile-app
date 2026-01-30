@@ -1,17 +1,21 @@
 import { StatusBar } from "expo-status-bar";
+import React from "react";
 import {
   SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
+  TextStyle,
   TouchableOpacity,
   View,
+  ViewStyle,
 } from "react-native";
 
 export default function Home() {
   return (
     <SafeAreaView style={styles.safe}>
       <StatusBar style="light" />
+
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.container}
@@ -94,20 +98,25 @@ export default function Home() {
         <NewsItem title="Bitcoin hits new resistance at $43k" />
         <NewsItem title="Ethereum gas fees drop by 18%" />
 
-        {/* Bottom Spacing */}
         <View style={{ height: 30 }} />
       </ScrollView>
     </SafeAreaView>
   );
 }
 
-/* 🔹 Reusable Components */
+type SectionTitleProps = {
+  title: string;
+};
 
-function SectionTitle({ title }) {
+function SectionTitle({ title }: SectionTitleProps) {
   return <Text style={styles.sectionTitle}>{title}</Text>;
 }
 
-function ActionButton({ title }) {
+type ActionButtonProps = {
+  title: string;
+};
+
+function ActionButton({ title }: ActionButtonProps) {
   return (
     <TouchableOpacity style={styles.actionBtn}>
       <Text style={styles.actionText}>{title}</Text>
@@ -115,13 +124,28 @@ function ActionButton({ title }) {
   );
 }
 
-function CryptoItem({ name, symbol, price, change, negative }) {
+type CryptoItemProps = {
+  name: string;
+  symbol: string;
+  price: string;
+  change: string;
+  negative?: boolean;
+};
+
+function CryptoItem({
+  name,
+  symbol,
+  price,
+  change,
+  negative,
+}: CryptoItemProps) {
   return (
     <View style={styles.listItem}>
       <View>
         <Text style={styles.listTitle}>{name}</Text>
         <Text style={styles.listSub}>{symbol}</Text>
       </View>
+
       <View style={{ alignItems: "flex-end" }}>
         <Text style={styles.listValue}>{price}</Text>
         <Text
@@ -134,7 +158,13 @@ function CryptoItem({ name, symbol, price, change, negative }) {
   );
 }
 
-function MoverItem({ name, change, negative }) {
+type MoverItemProps = {
+  name: string;
+  change: string;
+  negative?: boolean;
+};
+
+function MoverItem({ name, change, negative }: MoverItemProps) {
   return (
     <View style={styles.moverItem}>
       <Text style={styles.listTitle}>{name}</Text>
@@ -147,13 +177,26 @@ function MoverItem({ name, change, negative }) {
   );
 }
 
-function TransactionItem({ title, amount, date, negative }) {
+type TransactionItemProps = {
+  title: string;
+  amount: string;
+  date: string;
+  negative?: boolean;
+};
+
+function TransactionItem({
+  title,
+  amount,
+  date,
+  negative,
+}: TransactionItemProps) {
   return (
     <View style={styles.listItem}>
       <View>
         <Text style={styles.listTitle}>{title}</Text>
         <Text style={styles.listSub}>{date}</Text>
       </View>
+
       <Text
         style={[styles.listValue, { color: negative ? "#ef4444" : "#22c55e" }]}
       >
@@ -163,7 +206,11 @@ function TransactionItem({ title, amount, date, negative }) {
   );
 }
 
-function NewsItem({ title }) {
+type NewsItemProps = {
+  title: string;
+};
+
+function NewsItem({ title }: NewsItemProps) {
   return (
     <View style={styles.newsItem}>
       <Text style={styles.newsText}>{title}</Text>
@@ -171,8 +218,36 @@ function NewsItem({ title }) {
   );
 }
 
+type Styles = {
+  safe: ViewStyle;
+  container: ViewStyle;
+  header: ViewStyle;
+  welcome: TextStyle;
+  name: TextStyle;
+  profile: ViewStyle;
+  profileText: TextStyle;
+  balanceCard: ViewStyle;
+  balanceLabel: TextStyle;
+  balance: TextStyle;
+  balanceRow: ViewStyle;
+  profit: TextStyle;
+  profitText: TextStyle;
+  actions: ViewStyle;
+  actionBtn: ViewStyle;
+  actionText: TextStyle;
+  sectionTitle: TextStyle;
+  listItem: ViewStyle;
+  moverItem: ViewStyle;
+  listTitle: TextStyle;
+  listSub: TextStyle;
+  listValue: TextStyle;
+  change: TextStyle;
+  newsItem: ViewStyle;
+  newsText: TextStyle;
+};
+
 /* 🎨 Styles */
-const styles = StyleSheet.create({
+const styles = StyleSheet.create<Styles>({
   safe: {
     flex: 1,
     backgroundColor: "#020617",
