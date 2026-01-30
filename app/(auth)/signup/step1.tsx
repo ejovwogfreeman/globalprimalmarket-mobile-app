@@ -1,17 +1,30 @@
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { useState } from "react";
 import {
   SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
+  TextStyle,
   TouchableOpacity,
   View,
+  ViewStyle,
 } from "react-native";
+import { useSignUp } from "../../../context/SignUpContext";
 
 export default function Step1() {
   const router = useRouter();
+
+  const { updateSignUpData } = useSignUp();
+
+  const [form, setForm] = useState({
+    userName: "",
+    fullName: "",
+    email: "",
+    phoneNumber: "",
+  });
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -35,6 +48,8 @@ export default function Step1() {
             placeholder="Choose username"
             placeholderTextColor="#64748b"
             style={styles.input}
+            value={form.userName}
+            onChangeText={(t) => setForm({ ...form, userName: t })}
           />
 
           <Text style={styles.label}>Full Name *</Text>
@@ -42,6 +57,8 @@ export default function Step1() {
             placeholder="Enter full name"
             placeholderTextColor="#64748b"
             style={styles.input}
+            value={form.fullName}
+            onChangeText={(t) => setForm({ ...form, fullName: t })}
           />
 
           <Text style={styles.label}>Email Address *</Text>
@@ -51,6 +68,8 @@ export default function Step1() {
             keyboardType="email-address"
             autoCapitalize="none"
             style={styles.input}
+            value={form.email}
+            onChangeText={(t) => setForm({ ...form, email: t })}
           />
 
           <Text style={styles.label}>Phone Number *</Text>
@@ -59,11 +78,16 @@ export default function Step1() {
             placeholderTextColor="#64748b"
             keyboardType="phone-pad"
             style={styles.input}
+            value={form.phoneNumber}
+            onChangeText={(t) => setForm({ ...form, phoneNumber: t })}
           />
 
           <TouchableOpacity
             style={styles.button}
-            onPress={() => router.push("/signup/step2")}
+            onPress={() => {
+              updateSignUpData(form);
+              router.push("/signup/step2");
+            }}
           >
             <Text style={styles.buttonText}>Continue</Text>
           </TouchableOpacity>
@@ -80,7 +104,26 @@ export default function Step1() {
   );
 }
 
-const styles = StyleSheet.create({
+type Styles = {
+  safe: ViewStyle;
+  scroll: ViewStyle;
+  container: ViewStyle;
+  progress: ViewStyle;
+  step: TextStyle;
+  title: TextStyle;
+  subtitle: TextStyle;
+  label: TextStyle;
+  input: TextStyle; // TextInput uses TextStyle for color, fontSize, etc.
+  select: ViewStyle;
+  selectText: TextStyle;
+  button: ViewStyle;
+  buttonText: TextStyle;
+  footer: ViewStyle;
+  footerText: TextStyle;
+  link: TextStyle;
+};
+
+const styles = StyleSheet.create<Styles>({
   safe: {
     flex: 1,
     backgroundColor: "#020617",
@@ -150,7 +193,7 @@ const styles = StyleSheet.create({
 
   footerText: {
     color: "#94a3b8",
-    marginRight: "10",
+    marginRight: 10,
   },
 
   link: {

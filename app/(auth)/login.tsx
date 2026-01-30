@@ -4,8 +4,10 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  TextStyle,
   TouchableOpacity,
   View,
+  ViewStyle,
 } from "react-native";
 
 export default function Login() {
@@ -61,7 +63,22 @@ export default function Login() {
   );
 }
 
-const styles = StyleSheet.create({
+type Styles = {
+  container: ViewStyle;
+  title: TextStyle;
+  subtitle: TextStyle;
+  card: ViewStyle;
+  input: TextStyle;
+  forgotContainer: ViewStyle;
+  forgotText: TextStyle;
+  button: ViewStyle;
+  buttonText: TextStyle;
+  footer: ViewStyle;
+  footerText: TextStyle;
+  link: TextStyle;
+};
+
+export const styles = StyleSheet.create<Styles>({
   container: {
     flex: 1,
     backgroundColor: "#0f172a", // dark navy
@@ -111,6 +128,11 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: "center",
   },
+  buttonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
+  },
   footer: {
     flexDirection: "row",
     justifyContent: "center",
@@ -119,7 +141,7 @@ const styles = StyleSheet.create({
 
   footerText: {
     color: "#94a3b8",
-    marginRight: "10",
+    marginRight: 10,
   },
 
   link: {

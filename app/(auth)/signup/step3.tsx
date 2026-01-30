@@ -1,17 +1,40 @@
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { useState } from "react";
 import {
   SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
+  TextStyle,
   TouchableOpacity,
   View,
+  ViewStyle,
 } from "react-native";
+import { useSignUp } from "../../../context/SignUpContext";
 
 export default function Step3() {
   const router = useRouter();
+  const { signUpData, updateSignUpData } = useSignUp();
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+
+  const handleSignup = () => {
+    if (password !== confirm) return;
+
+    updateSignUpData({ password });
+
+    console.log("FINAL SIGNUP DATA:", {
+      ...signUpData,
+      password,
+    });
+
+    // 🔥 Send everything to your API here
+    // fetch("/signup", { body: JSON.stringify(...) })
+
+    router.replace("/verify");
+  };
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -33,19 +56,27 @@ export default function Step3() {
             placeholderTextColor="#64748b"
             secureTextEntry
             style={styles.input}
+            value={password}
+            onChangeText={(text) => {
+              setPassword(text);
+              updateSignUpData({ password: text });
+            }}
           />
 
           <Text style={styles.label}>Confirm Password *</Text>
           <TextInput
-            placeholder="Confirm password"
+            placeholder="Enter password"
             placeholderTextColor="#64748b"
             secureTextEntry
             style={styles.input}
+            value={confirm}
+            onChangeText={(text) => setConfirm(text)}
           />
 
           <TouchableOpacity
             style={styles.button}
-            onPress={() => router.replace("/verify")}
+            // onPress={() => router.replace("/verify")}
+            onPress={handleSignup}
           >
             <Text style={styles.buttonText}>Create Account</Text>
           </TouchableOpacity>
@@ -61,7 +92,26 @@ export default function Step3() {
   );
 }
 
-const styles = StyleSheet.create({
+type Styles = {
+  safe: ViewStyle;
+  scroll: ViewStyle;
+  container: ViewStyle;
+  progress: ViewStyle;
+  step: TextStyle;
+  title: TextStyle;
+  subtitle: TextStyle;
+  label: TextStyle;
+  input: TextStyle; // changed
+  select: ViewStyle;
+  selectText: TextStyle;
+  button: ViewStyle;
+  buttonText: TextStyle;
+  footer: ViewStyle;
+  footerText: TextStyle;
+  link: TextStyle;
+};
+
+const styles = StyleSheet.create<Styles>({
   safe: {
     flex: 1,
     backgroundColor: "#020617",
@@ -131,7 +181,7 @@ const styles = StyleSheet.create({
 
   footerText: {
     color: "#94a3b8",
-    marginRight: "10",
+    marginRight: 10,
   },
 
   link: {
