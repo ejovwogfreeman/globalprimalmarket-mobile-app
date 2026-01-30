@@ -1,5 +1,72 @@
+// import { useRouter } from "expo-router";
+// import {
+//   StatusBar,
+//   StyleSheet,
+//   Text,
+//   TextInput,
+//   TextStyle,
+//   TouchableOpacity,
+//   View,
+//   ViewStyle,
+// } from "react-native";
+
+// export default function Login() {
+//   const router = useRouter();
+
+//   return (
+//     <View style={styles.container}>
+//       <StatusBar barStyle="light-content" />
+
+//       {/* Title */}
+//       <Text style={styles.title}>Welcome Back 👋</Text>
+//       <Text style={styles.subtitle}>Login to continue</Text>
+
+//       {/* Card */}
+//       <View style={styles.card}>
+//         {/* Email */}
+//         <TextInput
+//           placeholder="Email"
+//           placeholderTextColor="#9ca3af"
+//           style={styles.input}
+//         />
+
+//         {/* Password */}
+//         <TextInput
+//           placeholder="Password"
+//           placeholderTextColor="#9ca3af"
+//           secureTextEntry
+//           style={styles.input}
+//         />
+
+//         {/* Forgot Password */}
+//         <TouchableOpacity style={styles.forgotContainer}>
+//           <Text style={styles.forgotText}>Forgot Password?</Text>
+//         </TouchableOpacity>
+
+//         {/* Login Button */}
+//         <TouchableOpacity
+//           style={styles.button}
+//           onPress={() => router.replace("/home")}
+//         >
+//           <Text style={styles.buttonText}>Login</Text>
+//         </TouchableOpacity>
+//       </View>
+
+//       {/* Footer */}
+//       <View style={styles.footer}>
+//         <Text style={styles.footerText}> Don’t have an account?</Text>
+//         <TouchableOpacity onPress={() => router.push("/signup/step1")}>
+//           <Text style={styles.link}>Sign Up</Text>
+//         </TouchableOpacity>
+//       </View>
+//     </View>
+//   );
+// }
+
 import { useRouter } from "expo-router";
+import React, { useState } from "react";
 import {
+  Alert,
   StatusBar,
   StyleSheet,
   Text,
@@ -9,9 +76,93 @@ import {
   View,
   ViewStyle,
 } from "react-native";
+import { loginUser } from "../../data/api";
 
 export default function Login() {
   const router = useRouter();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  // const handleLogin = async () => {
+  //   if (!email || !password) {
+  //     Alert.alert("Missing Fields", "Please enter email and password");
+  //     return;
+  //   }
+
+  //   setLoading(true);
+
+  //   try {
+  //     const res = await loginUser({ email, password });
+
+  //     if (res.success && res.user) {
+  //       if (!res.user.isVerified) {
+  //         // ❌ Not verified → go to verify
+  //         Alert.alert(
+  //           "Account Not Verified",
+  //           "Please verify your email to continue.",
+  //         );
+
+  //         router.replace({
+  //           pathname: "/verify",
+  //           params: { email: res.user.email },
+  //         });
+  //       } else {
+  //         // ✅ Verified → go home
+  //         router.replace("/home");
+  //       }
+  //     } else {
+  //       Alert.alert("Login Failed", res.message);
+  //     }
+  //   } catch (error: any) {
+  //     Alert.alert("Error", error.message || "Something went wrong");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+  const handleLogin = async () => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!email || !password) {
+      Alert.alert("Missing Fields", "Please enter email and password");
+      return;
+    }
+
+    if (!emailRegex.test(email)) {
+      Alert.alert("Invalid Email", "Please enter a valid email address");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const res = await loginUser({ email, password });
+
+      if (res.success && res.user) {
+        if (!res.user.isVerified) {
+          Alert.alert(
+            "Account Not Verified",
+            "Please verify your account to continue.",
+          );
+
+          router.replace({
+            pathname: "/verify",
+            params: { email: res.user.email },
+          });
+        } else {
+          router.replace("/home");
+        }
+      } else {
+        Alert.alert("Login Failed", res.message);
+      }
+    } catch (error: any) {
+      Alert.alert("Error", error.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -28,6 +179,10 @@ export default function Login() {
           placeholder="Email"
           placeholderTextColor="#9ca3af"
           style={styles.input}
+          value={email}
+          onChangeText={setEmail}
+          autoCapitalize="none"
+          keyboardType="email-address"
         />
 
         {/* Password */}
@@ -36,6 +191,8 @@ export default function Login() {
           placeholderTextColor="#9ca3af"
           secureTextEntry
           style={styles.input}
+          value={password}
+          onChangeText={setPassword}
         />
 
         {/* Forgot Password */}
@@ -46,15 +203,18 @@ export default function Login() {
         {/* Login Button */}
         <TouchableOpacity
           style={styles.button}
-          onPress={() => router.replace("/home")}
+          onPress={handleLogin}
+          disabled={loading}
         >
-          <Text style={styles.buttonText}>Login</Text>
+          <Text style={styles.buttonText}>
+            {loading ? "Logging in..." : "Login"}
+          </Text>
         </TouchableOpacity>
       </View>
 
       {/* Footer */}
       <View style={styles.footer}>
-        <Text style={styles.footerText}> Don’t have an account?</Text>
+        <Text style={styles.footerText}>Don’t have an account?</Text>
         <TouchableOpacity onPress={() => router.push("/signup/step1")}>
           <Text style={styles.link}>Sign Up</Text>
         </TouchableOpacity>

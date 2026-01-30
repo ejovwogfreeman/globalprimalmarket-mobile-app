@@ -3,7 +3,6 @@ import axios, { AxiosResponse } from "axios";
 // -----------------------------
 // Base API Configuration
 // -----------------------------
-// const API_BASE_URL = "http://localhost:8000/api";
 const API_BASE_URL = "https://globalprimalmarket-api.vercel.app/api";
 
 const api = axios.create({
@@ -30,6 +29,15 @@ export type LoginData = {
   password: string;
 };
 
+export type VerifyData = {
+  email: string;
+  code: string; // OTP or verification code
+};
+
+export type ResendVerificationData = {
+  email: string;
+};
+
 export type AuthResponse = {
   success: boolean;
   message: string;
@@ -42,6 +50,7 @@ export type AuthResponse = {
     phoneNumber: string;
     country: string;
     password: string;
+    isVerified?: boolean;
   };
 };
 
@@ -60,11 +69,10 @@ export const registerUser = async (
     );
     return response.data;
   } catch (error: any) {
-    // Axios errors
     return {
       success: false,
-      message: error,
-      // message: error.response?.data?.message || "Registration failed",
+      message:
+        error.response?.data?.message || error.message || "Registration failed",
     };
   }
 };
@@ -80,7 +88,45 @@ export const loginUser = async (data: LoginData): Promise<AuthResponse> => {
   } catch (error: any) {
     return {
       success: false,
-      message: error.response?.data?.message || "Login failed",
+      message: error.response?.data?.message || error.message || "Login failed",
+    };
+  }
+};
+
+// Verify (email or OTP)
+export const verifyUser = async (data: VerifyData): Promise<AuthResponse> => {
+  try {
+    const response: AxiosResponse<AuthResponse> = await api.post(
+      "/auth/verify",
+      data,
+    );
+    return response.data;
+  } catch (error: any) {
+    return {
+      success: false,
+      message:
+        error.response?.data?.message || error.message || "Verification failed",
+    };
+  }
+};
+
+// Verify (email or OTP)
+export const resendVerification = async (
+  data: ResendVerificationData,
+): Promise<AuthResponse> => {
+  try {
+    const response: AxiosResponse<AuthResponse> = await api.post(
+      "/auth/resend-verification",
+      data,
+    );
+    return response.data;
+  } catch (error: any) {
+    return {
+      success: false,
+      message:
+        error.response?.data?.message ||
+        error.message ||
+        "Error Sending Verification code",
     };
   }
 };
@@ -98,7 +144,10 @@ export const getProfile = async (token: string): Promise<AuthResponse> => {
   } catch (error: any) {
     return {
       success: false,
-      message: error.response?.data?.message || "Failed to fetch profile",
+      message:
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to fetch profile",
     };
   }
 };

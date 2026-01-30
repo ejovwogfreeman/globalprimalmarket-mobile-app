@@ -30,8 +30,59 @@ export default function Step3() {
     setIsFilled(password.trim() !== "" && confirm.trim() !== "");
   }, [password, confirm]);
 
+  // const handleSignup = async () => {
+  //   // ✅ Check password length
+  //   if (password.length < 8) {
+  //     Alert.alert(
+  //       "Weak Password",
+  //       "Password must be at least 8 characters long.",
+  //     );
+  //     return;
+  //   }
+
+  //   // ✅ Check password match
+  //   if (password !== confirm) {
+  //     Alert.alert(
+  //       "Passwords do not match",
+  //       "Please make sure both passwords are the same.",
+  //     );
+  //     return;
+  //   }
+
+  //   setLoading(true);
+
+  //   const finalData: RegisterData = {
+  //     userName: signUpData.userName,
+  //     fullName: signUpData.fullName,
+  //     email: signUpData.email,
+  //     phoneNumber: signUpData.phoneNumber,
+  //     country: signUpData.country,
+  //     password: password, // use typed password
+  //   };
+
+  //   try {
+  //     console.warn("SignUpData:", signUpData);
+
+  //     const res = await registerUser(finalData);
+
+  //     if (res.success) {
+  //       updateSignUpData({ password });
+  //       Alert.alert("Registration Successful", res.message);
+  //       router.replace({
+  //         pathname: "/verify",
+  //         params: { email: signUpData.email },
+  //       });
+  //     } else {
+  //       Alert.alert("Registration Failed", res.message);
+  //     }
+  //   } catch (error: any) {
+  //     Alert.alert("Error", error.message || "Something went wrong.");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   const handleSignup = async () => {
-    // ✅ Check password length
     if (password.length < 8) {
       Alert.alert(
         "Weak Password",
@@ -40,7 +91,6 @@ export default function Step3() {
       return;
     }
 
-    // ✅ Check password match
     if (password !== confirm) {
       Alert.alert(
         "Passwords do not match",
@@ -57,22 +107,44 @@ export default function Step3() {
       email: signUpData.email,
       phoneNumber: signUpData.phoneNumber,
       country: signUpData.country,
-      password: password, // use typed password
+      password: password,
     };
 
     try {
-      console.warn("SignUpData:", signUpData);
-
       const res = await registerUser(finalData);
 
       if (res.success) {
+        // Registration success → redirect to verify
         updateSignUpData({ password });
         Alert.alert("Registration Successful", res.message);
-        router.replace("/verify");
+        router.replace({
+          pathname: "/verify",
+          params: { email: signUpData.email },
+        });
       } else {
-        Alert.alert("Registration Failed", res.message);
+        // Email already exists?
+        if (res.message.includes("Email already exists") && res.user) {
+          if (!res.user.isVerified) {
+            // User exists but not verified → go to verify page
+            Alert.alert("Email already exists", res.message);
+            router.replace({
+              pathname: "/verify",
+              params: { email: res.user.email },
+            });
+          } else {
+            // User exists and verified → go to login
+            Alert.alert(
+              "User Exists",
+              "You are already registered and verified. Please login.",
+            );
+            router.replace("/login");
+          }
+        } else {
+          Alert.alert("Registration Failed", res.message);
+        }
       }
     } catch (error: any) {
+      console.log(error);
       Alert.alert("Error", error.message || "Something went wrong.");
     } finally {
       setLoading(false);

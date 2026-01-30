@@ -1,5 +1,5 @@
-import { useRouter } from "expo-router";
-import React, { useRef, useState } from "react";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Alert,
   StatusBar,
@@ -11,33 +11,35 @@ import {
   View,
   ViewStyle,
 } from "react-native";
+import { resendVerification, verifyUser } from "../../data/api";
 
 export default function Verify() {
   const router = useRouter();
+  const { email } = useLocalSearchParams<{ email?: string }>(); // ✅ correct hook for RN
 
   const [code, setCode] = useState<string[]>(["", "", "", "", "", ""]);
   const [isVerifying, setIsVerifying] = useState<boolean>(false);
 
   const inputsRef = useRef<Array<TextInput | null>>([]);
 
-  const MOCK_CODE = "123456";
+  useEffect(() => {
+    if (!email) {
+      Alert.alert("Error", "Email not provided. Go back and try again.");
+      router.replace("/signup/step3"); // redirect if email is missing
+    }
+  }, [email]);
 
-  const handleChange = (value: string, index: number): void => {
-    // Allow only numbers
-    const num = value.replace(/[^0-9]/g, "");
+  const handleChange = (value: string, index: number) => {
+    const num = value.replace(/[^0-9]/g, ""); // allow only numbers
 
     if (num.length > 1) {
       // Handle pasted OTP
       const newCode = num.split("").slice(0, 6);
-
       setCode((prev) => {
         const updated = [...prev];
-        newCode.forEach((digit, i) => {
-          updated[i] = digit;
-        });
+        newCode.forEach((digit, i) => (updated[i] = digit));
         return updated;
       });
-
       const lastIndex = Math.min(newCode.length - 1, 5);
       inputsRef.current[lastIndex]?.focus();
       return;
@@ -55,13 +57,13 @@ export default function Verify() {
   const handleKeyPress = (
     e: { nativeEvent: { key: string } },
     index: number,
-  ): void => {
+  ) => {
     if (e.nativeEvent.key === "Backspace" && code[index] === "" && index > 0) {
       inputsRef.current[index - 1]?.focus();
     }
   };
 
-  const handleVerify = (): void => {
+  const handleVerify = async () => {
     const finalCode = code.join("");
 
     if (finalCode.length !== 6) {
@@ -72,17 +74,51 @@ export default function Verify() {
       return;
     }
 
+    if (!email) return;
+
     setIsVerifying(true);
 
-    setTimeout(() => {
-      setIsVerifying(false);
+    try {
+      const res = await verifyUser({ email, code: finalCode });
 
-      if (finalCode === MOCK_CODE) {
-        router.replace("/success");
+      if (res.success) {
+        Alert.alert("Success", "Your account has been verified!");
+        router.replace("/success"); // or next step after verification
       } else {
-        Alert.alert("Incorrect Code", "The code you entered is incorrect.");
+        Alert.alert("Verification Failed", res.message);
       }
-    }, 1000);
+    } catch (error: any) {
+      Alert.alert("Error", error.message || "Something went wrong");
+    } finally {
+      setIsVerifying(false);
+    }
+  };
+
+  const [isResending, setIsResending] = useState<boolean>(false);
+  const handleResend = async () => {
+    if (!email) {
+      Alert.alert("Error", "Email not found.");
+      return;
+    }
+
+    setIsResending(true);
+
+    try {
+      const res = await resendVerification({ email });
+
+      if (res.success) {
+        Alert.alert(
+          "Code Sent",
+          "A new verification code has been sent to your email.",
+        );
+      } else {
+        Alert.alert("Error", res.message);
+      }
+    } catch (error: any) {
+      Alert.alert("Error", error.message || "Something went wrong");
+    } finally {
+      setIsResending(false);
+    }
   };
 
   return (
@@ -123,6 +159,15 @@ export default function Verify() {
           </Text>
         </TouchableOpacity>
       </View>
+      <TouchableOpacity
+        onPress={handleResend}
+        disabled={isResending}
+        style={styles.resendContainer}
+      >
+        <Text style={styles.resendText}>
+          {isResending ? "Resending..." : "Didn’t get a code? Resend"}
+        </Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -136,6 +181,8 @@ type Styles = {
   otpInput: TextStyle;
   button: ViewStyle;
   buttonText: TextStyle;
+  resendContainer: ViewStyle;
+  resendText: TextStyle;
 };
 
 const styles = StyleSheet.create<Styles>({
@@ -188,4 +235,14 @@ const styles = StyleSheet.create<Styles>({
     alignItems: "center",
   },
   buttonText: { color: "#fff", fontSize: 16, fontWeight: "600" },
+  resendContainer: {
+    marginTop: 16,
+    alignItems: "center",
+  },
+
+  resendText: {
+    color: "#4F8EF7",
+    fontSize: 14,
+    fontWeight: "500",
+  },
 });
