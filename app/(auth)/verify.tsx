@@ -83,7 +83,12 @@ export default function Verify() {
 
       if (res.success) {
         Alert.alert("Success", "Your account has been verified!");
-        router.replace("/success"); // or next step after verification
+        router.replace({
+          pathname: "/success",
+          params: {
+            message: "Your account has been successfully verified.",
+          },
+        });
       } else {
         Alert.alert("Verification Failed", res.message);
       }

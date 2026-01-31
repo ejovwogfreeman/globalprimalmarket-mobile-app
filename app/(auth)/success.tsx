@@ -1,4 +1,4 @@
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import {
   StatusBar,
   StyleSheet,
@@ -11,22 +11,21 @@ import {
 
 export default function Success() {
   const router = useRouter();
+  const { message } = useLocalSearchParams<{ message?: string }>();
 
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
 
       <Text style={styles.emoji}>✅</Text>
-      <Text style={styles.title}>Email Verified!</Text>
-      <Text style={styles.subtitle}>
-        Your account has been successfully verified.
-      </Text>
+      <Text style={styles.title}>Action Successful!</Text>
+      <Text style={styles.subtitle}>{message || "Action Success!"}</Text>
 
       <TouchableOpacity
         style={styles.button}
         onPress={() => router.replace("/login")}
       >
-        <Text style={styles.buttonText}>Go to Home</Text>
+        <Text style={styles.buttonText}>Proceed to Login</Text>
       </TouchableOpacity>
     </View>
   );

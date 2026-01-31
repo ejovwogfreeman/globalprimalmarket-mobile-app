@@ -38,7 +38,10 @@ export default function ForgetPassword() {
 
       if (res.success) {
         // Show alert first
-        Alert.alert("Success", "Check your email for the code!");
+        Alert.alert(
+          "Code Sent",
+          "Password reset email sent. Check your inbox for the code.",
+        );
 
         // Navigate to ChangePassword screen
         router.replace({

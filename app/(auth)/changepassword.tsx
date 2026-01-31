@@ -71,8 +71,8 @@ export default function ChangePassword() {
       return;
     }
 
-    if (!newPassword || newPassword.length < 6) {
-      Alert.alert("Weak Password", "Password must be at least 6 characters");
+    if (!newPassword || newPassword.length < 8) {
+      Alert.alert("Weak Password", "Password must be at least 8 characters");
       return;
     }
 
@@ -86,8 +86,13 @@ export default function ChangePassword() {
       });
 
       if (res.success) {
-        Alert.alert("Success 🔐", "Password changed successfully");
-        router.replace("/login");
+        Alert.alert("Success 🔐", "Password changed successfully.");
+        router.replace({
+          pathname: "/success",
+          params: {
+            message: "Password changed successfully.",
+          },
+        });
       } else {
         Alert.alert("Error", res.message);
       }
@@ -113,7 +118,7 @@ export default function ChangePassword() {
       if (res.success) {
         Alert.alert(
           "Code Sent",
-          "A new verification code has been sent to your email.",
+          "Password reset email sent. Check your inbox for the code.",
         );
       } else {
         Alert.alert("Error", res.message);
