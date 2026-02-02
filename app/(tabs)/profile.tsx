@@ -1,5 +1,66 @@
+// import { StatusBar } from "expo-status-bar";
+// import React from "react";
+// import {
+//   SafeAreaView,
+//   StyleSheet,
+//   Text,
+//   TextStyle,
+//   TouchableOpacity,
+//   View,
+//   ViewStyle,
+// } from "react-native";
+
+// export default function Profile() {
+//   return (
+//     <SafeAreaView style={styles.safe}>
+//       <StatusBar style="light" />
+
+//       <View style={styles.container}>
+//         {/* Header */}
+//         <Text style={styles.title}>Profile</Text>
+
+//         {/* Avatar */}
+//         <View style={styles.avatar}>
+//           <Text style={styles.avatarText}>G</Text>
+//         </View>
+
+//         {/* User Info */}
+//         <Text style={styles.name}>Godbless</Text>
+//         <Text style={styles.username}>@godbless_trade</Text>
+
+//         {/* Info Card */}
+//         <View style={styles.card}>
+//           <ProfileRow label="Email" value="godbless@email.com" />
+//           <ProfileRow label="Phone" value="+234 812 345 6789" />
+//           <ProfileRow label="Account Type" value="Standard" />
+//         </View>
+
+//         {/* Button */}
+//         <TouchableOpacity style={styles.button}>
+//           <Text style={styles.buttonText}>Edit Profile</Text>
+//         </TouchableOpacity>
+//       </View>
+//     </SafeAreaView>
+//   );
+// }
+
+// type ProfileRowProps = {
+//   label: string;
+//   value: string;
+// };
+
+// function ProfileRow({ label, value }: ProfileRowProps) {
+//   return (
+//     <View style={styles.row}>
+//       <Text style={styles.rowLabel}>{label}</Text>
+//       <Text style={styles.rowValue}>{value}</Text>
+//     </View>
+//   );
+// }
+
+import { useUser } from "@/context/UserContext";
 import { StatusBar } from "expo-status-bar";
-import React from "react";
+import React, { ReactNode } from "react";
 import {
   SafeAreaView,
   StyleSheet,
@@ -11,6 +72,12 @@ import {
 } from "react-native";
 
 export default function Profile() {
+  const { user } = useUser();
+
+  if (!user) {
+    return null; // or loader
+  }
+
   return (
     <SafeAreaView style={styles.safe}>
       <StatusBar style="light" />
@@ -21,18 +88,30 @@ export default function Profile() {
 
         {/* Avatar */}
         <View style={styles.avatar}>
-          <Text style={styles.avatarText}>G</Text>
+          <Text style={styles.avatarText}>
+            {user.userName?.charAt(0).toUpperCase()}
+          </Text>
         </View>
 
         {/* User Info */}
-        <Text style={styles.name}>Godbless</Text>
-        <Text style={styles.username}>@godbless_trade</Text>
+        <Text style={styles.name}>{user.fullName}</Text>
+        <Text style={styles.username}>@{user.userName}</Text>
 
         {/* Info Card */}
         <View style={styles.card}>
-          <ProfileRow label="Email" value="godbless@email.com" />
-          <ProfileRow label="Phone" value="+234 812 345 6789" />
-          <ProfileRow label="Account Type" value="Standard" />
+          <ProfileRow label="Email" value={user.email} />
+          <ProfileRow label="Phone" value={user.phoneNumber} />
+          <ProfileRow label="Country" value={user.country} />
+          <ProfileRow label="Account Type" value={user.role} />
+          <ProfileRow
+            label="Verified"
+            value={<VerifiedBadge verified={user.isVerified} />}
+          />
+          <ProfileRow
+            label="Balance"
+            value={`$ ${user.balance.toLocaleString()}.00`}
+            isLast={true}
+          />
         </View>
 
         {/* Button */}
@@ -46,14 +125,33 @@ export default function Profile() {
 
 type ProfileRowProps = {
   label: string;
-  value: string;
+  value: string | ReactNode;
+  isLast?: boolean;
 };
 
-function ProfileRow({ label, value }: ProfileRowProps) {
+function ProfileRow({ label, value, isLast }: ProfileRowProps) {
   return (
-    <View style={styles.row}>
+    <View
+      style={[
+        styles.row,
+        !isLast && { borderBottomWidth: 1, borderBottomColor: "#1e293b" },
+      ]}
+    >
       <Text style={styles.rowLabel}>{label}</Text>
       <Text style={styles.rowValue}>{value}</Text>
+    </View>
+  );
+}
+
+function VerifiedBadge({ verified }: { verified: boolean }) {
+  return (
+    <View
+      style={[
+        styles.badge,
+        { backgroundColor: verified ? "#22c55e" : "#ef4444" },
+      ]}
+    >
+      <Text style={styles.badgeText}>{verified ? "Yes" : "No"}</Text>
     </View>
   );
 }
@@ -70,6 +168,8 @@ type Styles = {
   row: ViewStyle;
   rowLabel: TextStyle;
   rowValue: TextStyle;
+  badge: ViewStyle;
+  badgeText: TextStyle;
   button: ViewStyle;
   buttonText: TextStyle;
 };
@@ -118,6 +218,8 @@ const styles = StyleSheet.create<Styles>({
     width: "100%",
     borderRadius: 16,
     padding: 16,
+    paddingTop: 20,
+    paddingBottom: 0,
     marginBottom: 20,
   },
   row: {
@@ -126,17 +228,31 @@ const styles = StyleSheet.create<Styles>({
   rowLabel: {
     color: "#94a3b8",
     fontSize: 12,
+    marginBottom: 5,
   },
   rowValue: {
     color: "#f8fafc",
     fontSize: 15,
     fontWeight: "500",
+    paddingBottom: 6,
+    marginBottom: 6,
+  },
+  badge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 999,
+  },
+  badgeText: {
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "600",
   },
   button: {
     backgroundColor: "#2563eb",
     paddingVertical: 14,
-    paddingHorizontal: 40,
     borderRadius: 14,
+    width: "100%",
+    alignItems: "center",
   },
   buttonText: {
     color: "#fff",

@@ -1,5 +1,6 @@
+import { useUser } from "@/context/UserContext";
 import { StatusBar } from "expo-status-bar";
-import React from "react";
+import React, { useEffect } from "react";
 import {
   SafeAreaView,
   ScrollView,
@@ -12,6 +13,46 @@ import {
 } from "react-native";
 
 export default function Home() {
+  const { user } = useUser(); // ✅ get user from context
+
+  useEffect(() => {
+    // console.log("Logged-in user:", user); // ✅ check the user
+  }, [user]);
+
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+
+    if (hour < 12) return "Good morning";
+    if (hour < 17) return "Good afternoon";
+    if (hour < 21) return "Good evening";
+    return "Good night";
+  };
+
+  const getFormattedDateTime = () => {
+    const now = new Date();
+
+    const date = now.toLocaleDateString("en-US", {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+
+    const time = now.toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
+    return `${date} • ${time}`;
+  };
+
+  const formatCurrency = (amount?: number) => {
+    return new Intl.NumberFormat("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount ?? 0);
+  };
+
   return (
     <SafeAreaView style={styles.safe}>
       <StatusBar style="light" />
@@ -23,19 +64,22 @@ export default function Home() {
         {/* Header */}
         <View style={styles.header}>
           <View>
-            <Text style={styles.welcome}>Good morning 👋</Text>
-            <Text style={styles.name}>Godbless</Text>
+            <Text style={styles.welcome}>{getGreeting()} 👋</Text>
+            <Text style={styles.name}> {user?.userName || "Guest"}</Text>
+            <Text style={styles.welcome}>{getFormattedDateTime()}</Text>
           </View>
 
           <TouchableOpacity style={styles.profile}>
-            <Text style={styles.profileText}>G</Text>
+            <Text style={styles.profileText}>
+              {user?.userName?.charAt(0).toUpperCase()}
+            </Text>
           </TouchableOpacity>
         </View>
 
         {/* Balance Card */}
         <View style={styles.balanceCard}>
           <Text style={styles.balanceLabel}>Total Portfolio Value</Text>
-          <Text style={styles.balance}>$18,920.45</Text>
+          <Text style={styles.balance}>${formatCurrency(user?.balance)}</Text>
 
           <View style={styles.balanceRow}>
             <Text style={styles.profit}>+3.12%</Text>
@@ -269,6 +313,7 @@ const styles = StyleSheet.create<Styles>({
     color: "#f8fafc",
     fontSize: 22,
     fontWeight: "700",
+    marginLeft: -5,
   },
   profile: {
     width: 40,

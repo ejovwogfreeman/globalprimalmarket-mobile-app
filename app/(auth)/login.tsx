@@ -1,3 +1,5 @@
+import { User, useUser } from "@/context/UserContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
@@ -11,6 +13,7 @@ import {
   View,
   ViewStyle,
 } from "react-native";
+import Toast from "react-native-toast-message";
 import { loginUser } from "../../data/api";
 
 export default function Login() {
@@ -19,6 +22,54 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // const handleLogin = async () => {
+  //   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  //   if (!email || !password) {
+  //     Alert.alert("Missing Fields", "Please enter email and password");
+  //     return;
+  //   }
+
+  //   if (!emailRegex.test(email)) {
+  //     Alert.alert("Invalid Email", "Please enter a valid email address");
+  //     return;
+  //   }
+
+  //   setLoading(true);
+
+  //   try {
+  //     const res = await loginUser({ email, password });
+
+  //     if (res.success && res.user) {
+  //       if (!res.user.isVerified) {
+  //         Alert.alert(
+  //           "Account Not Verified",
+  //           "Please verify your account to continue.",
+  //         );
+
+  //         router.replace({
+  //           pathname: "/verify",
+  //           params: { email: res.user.email },
+  //         });
+  //       } else {
+  //         console.log(res);
+  //         router.replace("/home");
+  //         params: {
+  //           user: JSON.stringify(res.user);
+  //         }
+  //       }
+  //     } else {
+  //       Alert.alert("Login Failed", res.message);
+  //     }
+  //   } catch (error: any) {
+  //     Alert.alert("Error", error.message || "Something went wrong");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+  const { setUser } = useUser(); // get setUser from context
 
   const handleLogin = async () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -50,7 +101,22 @@ export default function Login() {
             params: { email: res.user.email },
           });
         } else {
+          // ✅ Correctly cast res.user to User
+
+          setUser(res.user as User);
+
+          // ✅ Save user to AsyncStorage
+          await AsyncStorage.setItem("user", JSON.stringify(res.user));
+
+          // ✅ Navigate to home
           router.replace("/home");
+          // ✅ Show login success toast
+          Toast.show({
+            type: "success",
+            text1: "Login Successful",
+            text2: `Welcome back, ${res.user.userName}!`,
+            position: "top",
+          });
         }
       } else {
         Alert.alert("Login Failed", res.message);

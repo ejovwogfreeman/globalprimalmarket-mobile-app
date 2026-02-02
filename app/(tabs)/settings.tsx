@@ -1,3 +1,5 @@
+import { useUser } from "@/context/UserContext";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import {
@@ -9,9 +11,33 @@ import {
   View,
   ViewStyle,
 } from "react-native";
+import Toast from "react-native-toast-message";
 
 export default function Settings() {
   const router = useRouter();
+  const { setUser } = useUser();
+
+  const handleLogout = async () => {
+    try {
+      // 1️⃣ Remove user from AsyncStorage
+      await AsyncStorage.removeItem("user");
+
+      // 2️⃣ Clear user in context
+      setUser(null);
+
+      // 3️⃣ Redirect to login
+      router.replace("/login");
+      // ✅ Show logout toast
+      Toast.show({
+        type: "error",
+        text1: "Logged Out",
+        text2: "You have successfully logged out.",
+        position: "top",
+      });
+    } catch (err) {
+      console.log("Logout error:", err);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -25,10 +51,7 @@ export default function Settings() {
         <SettingsItem title="Help & Support" />
 
         {/* Logout */}
-        <TouchableOpacity
-          style={styles.logout}
-          onPress={() => router.replace("/login")}
-        >
+        <TouchableOpacity style={styles.logout} onPress={handleLogout}>
           <Text style={styles.logoutText}>Log Out</Text>
         </TouchableOpacity>
       </View>
