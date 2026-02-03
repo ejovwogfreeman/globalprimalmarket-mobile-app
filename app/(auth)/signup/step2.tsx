@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import {
   FlatList,
   Modal,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -16,6 +15,7 @@ import {
   ViewStyle,
 } from "react-native";
 // ✅ Import the country data
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useSignUp } from "../../../context/SignUpContext";
 import { COUNTRIES } from "../../../data/countries";
 

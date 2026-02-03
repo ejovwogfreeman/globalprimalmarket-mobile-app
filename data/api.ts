@@ -1,3 +1,4 @@
+import { User } from "@/context/UserContext";
 import axios, { AxiosResponse } from "axios";
 
 // -----------------------------
@@ -52,16 +53,7 @@ export type AuthResponse = {
   success: boolean;
   message: string;
   token?: string;
-  user?: {
-    id: string;
-    userName?: string;
-    fullName: string;
-    email: string;
-    phoneNumber: string;
-    country: string;
-    password: string;
-    isVerified?: boolean;
-  };
+  user?: User;
 };
 
 // -----------------------------

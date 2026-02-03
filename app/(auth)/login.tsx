@@ -1,4 +1,4 @@
-import { User, useUser } from "@/context/UserContext";
+import { useUser } from "@/context/UserContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
@@ -22,52 +22,6 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-
-  // const handleLogin = async () => {
-  //   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-  //   if (!email || !password) {
-  //     Alert.alert("Missing Fields", "Please enter email and password");
-  //     return;
-  //   }
-
-  //   if (!emailRegex.test(email)) {
-  //     Alert.alert("Invalid Email", "Please enter a valid email address");
-  //     return;
-  //   }
-
-  //   setLoading(true);
-
-  //   try {
-  //     const res = await loginUser({ email, password });
-
-  //     if (res.success && res.user) {
-  //       if (!res.user.isVerified) {
-  //         Alert.alert(
-  //           "Account Not Verified",
-  //           "Please verify your account to continue.",
-  //         );
-
-  //         router.replace({
-  //           pathname: "/verify",
-  //           params: { email: res.user.email },
-  //         });
-  //       } else {
-  //         console.log(res);
-  //         router.replace("/home");
-  //         params: {
-  //           user: JSON.stringify(res.user);
-  //         }
-  //       }
-  //     } else {
-  //       Alert.alert("Login Failed", res.message);
-  //     }
-  //   } catch (error: any) {
-  //     Alert.alert("Error", error.message || "Something went wrong");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
 
   const { setUser } = useUser(); // get setUser from context
 
@@ -103,7 +57,7 @@ export default function Login() {
         } else {
           // ✅ Correctly cast res.user to User
 
-          setUser(res.user as User);
+          setUser(res.user);
 
           // ✅ Save user to AsyncStorage
           await AsyncStorage.setItem("user", JSON.stringify(res.user));

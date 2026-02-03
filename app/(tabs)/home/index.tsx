@@ -1,8 +1,9 @@
 import { useUser } from "@/context/UserContext";
+import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect } from "react";
 import {
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -11,6 +12,7 @@ import {
   View,
   ViewStyle,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Home() {
   const { user } = useUser(); // ✅ get user from context
@@ -89,10 +91,26 @@ export default function Home() {
 
         {/* Actions */}
         <View style={styles.actions}>
-          <ActionButton title="Send" />
-          <ActionButton title="Receive" />
-          <ActionButton title="Buy" />
-          <ActionButton title="Swap" />
+          <ActionButton
+            title="Deposit"
+            route="/home/deposit"
+            iconName="cash-outline"
+          />
+          <ActionButton
+            title="Withdraw"
+            route="/home/withdraw"
+            iconName="arrow-down-outline"
+          />
+          <ActionButton
+            title="Invest"
+            route="/home/invest"
+            iconName="trending-up-outline"
+          />
+          <ActionButton
+            title="Transactions"
+            route="/home/transactions"
+            iconName="swap-horizontal-outline"
+          />
         </View>
 
         {/* Portfolio */}
@@ -158,11 +176,32 @@ function SectionTitle({ title }: SectionTitleProps) {
 
 type ActionButtonProps = {
   title: string;
+  route:
+    | "/home/deposit"
+    | "/home/withdraw"
+    | "/home/invest"
+    | "/home/transactions";
+  iconName:
+    | "cash-outline"
+    | "arrow-down-outline"
+    | "trending-up-outline"
+    | "swap-horizontal-outline"; // pick Ionicons names you’ll use
 };
 
-function ActionButton({ title }: ActionButtonProps) {
+function ActionButton({ title, route, iconName }: ActionButtonProps) {
+  const router = useRouter();
+
   return (
-    <TouchableOpacity style={styles.actionBtn}>
+    <TouchableOpacity
+      style={styles.actionBtn}
+      onPress={() => router.push(route as Parameters<typeof router.push>[0])}
+    >
+      <Ionicons
+        name={iconName} // ✅ no need for `as any`
+        size={20}
+        color="#fff"
+        style={{ marginRight: 6 }}
+      />
       <Text style={styles.actionText}>{title}</Text>
     </TouchableOpacity>
   );

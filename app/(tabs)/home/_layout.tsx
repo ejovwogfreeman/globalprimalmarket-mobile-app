@@ -1,0 +1,22 @@
+import { Stack } from "expo-router";
+
+export default function HomeStackLayout() {
+  return (
+    <Stack
+      screenOptions={{
+        headerStyle: { backgroundColor: "#020617" },
+        headerTintColor: "#f8fafc",
+        headerTitleStyle: { fontWeight: "700" },
+      }}
+    >
+      {/* Home screen: no header, but also no title */}
+      <Stack.Screen name="index" options={{ headerShown: false, title: "" }} />
+
+      {/* Other screens: headers enabled */}
+      <Stack.Screen name="deposit" options={{ title: "Deposit" }} />
+      <Stack.Screen name="withdraw" options={{ title: "Withdraw" }} />
+      <Stack.Screen name="invest" options={{ title: "Invest" }} />
+      <Stack.Screen name="transactions" options={{ title: "Transactions" }} />
+    </Stack>
+  );
+}

@@ -1,68 +1,8 @@
-// import { StatusBar } from "expo-status-bar";
-// import React from "react";
-// import {
-//   SafeAreaView,
-//   StyleSheet,
-//   Text,
-//   TextStyle,
-//   TouchableOpacity,
-//   View,
-//   ViewStyle,
-// } from "react-native";
-
-// export default function Profile() {
-//   return (
-//     <SafeAreaView style={styles.safe}>
-//       <StatusBar style="light" />
-
-//       <View style={styles.container}>
-//         {/* Header */}
-//         <Text style={styles.title}>Profile</Text>
-
-//         {/* Avatar */}
-//         <View style={styles.avatar}>
-//           <Text style={styles.avatarText}>G</Text>
-//         </View>
-
-//         {/* User Info */}
-//         <Text style={styles.name}>Godbless</Text>
-//         <Text style={styles.username}>@godbless_trade</Text>
-
-//         {/* Info Card */}
-//         <View style={styles.card}>
-//           <ProfileRow label="Email" value="godbless@email.com" />
-//           <ProfileRow label="Phone" value="+234 812 345 6789" />
-//           <ProfileRow label="Account Type" value="Standard" />
-//         </View>
-
-//         {/* Button */}
-//         <TouchableOpacity style={styles.button}>
-//           <Text style={styles.buttonText}>Edit Profile</Text>
-//         </TouchableOpacity>
-//       </View>
-//     </SafeAreaView>
-//   );
-// }
-
-// type ProfileRowProps = {
-//   label: string;
-//   value: string;
-// };
-
-// function ProfileRow({ label, value }: ProfileRowProps) {
-//   return (
-//     <View style={styles.row}>
-//       <Text style={styles.rowLabel}>{label}</Text>
-//       <Text style={styles.rowValue}>{value}</Text>
-//     </View>
-//   );
-// }
-
 import { useUser } from "@/context/UserContext";
 import { StatusBar } from "expo-status-bar";
 import React, { ReactNode } from "react";
 import {
-  SafeAreaView,
+  ScrollView,
   StyleSheet,
   Text,
   TextStyle,
@@ -70,6 +10,7 @@ import {
   View,
   ViewStyle,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Profile() {
   const { user } = useUser();
@@ -82,20 +23,20 @@ export default function Profile() {
     <SafeAreaView style={styles.safe}>
       <StatusBar style="light" />
 
-      <View style={styles.container}>
+      <ScrollView showsVerticalScrollIndicator={false} style={styles.container}>
         {/* Header */}
-        <Text style={styles.title}>Profile</Text>
-
-        {/* Avatar */}
-        <View style={styles.avatar}>
-          <Text style={styles.avatarText}>
-            {user.userName?.charAt(0).toUpperCase()}
-          </Text>
+        <View style={styles.profileHeader}>
+          <Text style={styles.title}>Profile</Text>
+          {/* Avatar */}
+          <View style={styles.avatar}>
+            <Text style={styles.avatarText}>
+              {user.userName?.charAt(0).toUpperCase()}
+            </Text>
+          </View>
+          {/* User Info */}
+          <Text style={styles.name}>{user.fullName}</Text>
+          <Text style={styles.username}>@{user.userName}</Text>
         </View>
-
-        {/* User Info */}
-        <Text style={styles.name}>{user.fullName}</Text>
-        <Text style={styles.username}>@{user.userName}</Text>
 
         {/* Info Card */}
         <View style={styles.card}>
@@ -109,7 +50,7 @@ export default function Profile() {
           />
           <ProfileRow
             label="Balance"
-            value={`$ ${user.balance.toLocaleString()}.00`}
+            value={`$${user.balance.toLocaleString()}.00`}
             isLast={true}
           />
         </View>
@@ -118,7 +59,7 @@ export default function Profile() {
         <TouchableOpacity style={styles.button}>
           <Text style={styles.buttonText}>Edit Profile</Text>
         </TouchableOpacity>
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -159,6 +100,7 @@ function VerifiedBadge({ verified }: { verified: boolean }) {
 type Styles = {
   safe: ViewStyle;
   container: ViewStyle;
+  profileHeader: ViewStyle;
   title: TextStyle;
   avatar: ViewStyle;
   avatarText: TextStyle;
@@ -182,6 +124,9 @@ const styles = StyleSheet.create<Styles>({
   },
   container: {
     padding: 24,
+    // alignItems: "center",
+  },
+  profileHeader: {
     alignItems: "center",
   },
   title: {

@@ -1,115 +1,8 @@
-// import { useRouter } from "expo-router";
-// import { StatusBar } from "expo-status-bar";
-// import { useState } from "react";
-// import {
-//   SafeAreaView,
-//   ScrollView,
-//   StyleSheet,
-//   Text,
-//   TextInput,
-//   TextStyle,
-//   TouchableOpacity,
-//   View,
-//   ViewStyle,
-// } from "react-native";
-// import { useSignUp } from "../../../context/SignUpContext";
-
-// export default function Step1() {
-//   const router = useRouter();
-
-//   const { updateSignUpData } = useSignUp();
-
-//   const [form, setForm] = useState({
-//     userName: "",
-//     fullName: "",
-//     email: "",
-//     phoneNumber: "",
-//   });
-
-//   return (
-//     <SafeAreaView style={styles.safe}>
-//       <StatusBar style="light" />
-
-//       <ScrollView
-//         showsVerticalScrollIndicator={false}
-//         contentContainerStyle={styles.scroll}
-//       >
-//         <View style={styles.container}>
-//           {/* Progress */}
-//           <View style={styles.progress}>
-//             <Text style={styles.step}>1/3</Text>
-//           </View>
-
-//           <Text style={styles.title}>Create Account</Text>
-//           <Text style={styles.subtitle}>Open your crypto trading account</Text>
-
-//           <Text style={styles.label}>Trading Username *</Text>
-//           <TextInput
-//             placeholder="Choose username"
-//             placeholderTextColor="#64748b"
-//             style={styles.input}
-//             value={form.userName}
-//             onChangeText={(t) => setForm({ ...form, userName: t })}
-//           />
-
-//           <Text style={styles.label}>Full Name *</Text>
-//           <TextInput
-//             placeholder="Enter full name"
-//             placeholderTextColor="#64748b"
-//             style={styles.input}
-//             value={form.fullName}
-//             onChangeText={(t) => setForm({ ...form, fullName: t })}
-//           />
-
-//           <Text style={styles.label}>Email Address *</Text>
-//           <TextInput
-//             placeholder="your.email@example.com"
-//             placeholderTextColor="#64748b"
-//             keyboardType="email-address"
-//             autoCapitalize="none"
-//             style={styles.input}
-//             value={form.email}
-//             onChangeText={(t) => setForm({ ...form, email: t })}
-//           />
-
-//           <Text style={styles.label}>Phone Number *</Text>
-//           <TextInput
-//             placeholder="+234 812 345 6789"
-//             placeholderTextColor="#64748b"
-//             keyboardType="phone-pad"
-//             style={styles.input}
-//             value={form.phoneNumber}
-//             onChangeText={(t) => setForm({ ...form, phoneNumber: t })}
-//           />
-
-//           <TouchableOpacity
-//             style={styles.button}
-//             onPress={() => {
-//               updateSignUpData(form);
-//               router.push("/signup/step2");
-//             }}
-//           >
-//             <Text style={styles.buttonText}>Continue</Text>
-//           </TouchableOpacity>
-//         </View>
-//         {/* Footer */}
-//         <View style={styles.footer}>
-//           <Text style={styles.footerText}> Already have an account?</Text>
-//           <TouchableOpacity onPress={() => router.back()}>
-//             <Text style={styles.link}>Login</Text>
-//           </TouchableOpacity>
-//         </View>
-//       </ScrollView>
-//     </SafeAreaView>
-//   );
-// }
-
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import {
   Alert,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -119,6 +12,7 @@ import {
   View,
   ViewStyle,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useSignUp } from "../../../context/SignUpContext";
 
 interface FormData {
