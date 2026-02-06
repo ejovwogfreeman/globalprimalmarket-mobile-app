@@ -12,6 +12,7 @@ export interface User {
   balance: number;
   role: string;
   createdAt?: string;
+  token?: string;
 }
 
 interface UserContextType {

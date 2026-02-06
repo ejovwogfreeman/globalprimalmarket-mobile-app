@@ -20,7 +20,7 @@ export default function Profile() {
   }
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.safe} edges={["top"]}>
       <StatusBar style="light" />
 
       <ScrollView showsVerticalScrollIndicator={false} style={styles.container}>

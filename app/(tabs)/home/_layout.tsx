@@ -13,8 +13,17 @@ export default function HomeStackLayout() {
       <Stack.Screen name="index" options={{ headerShown: false, title: "" }} />
 
       {/* Other screens: headers enabled */}
+      <Stack.Screen
+        name="depositmethod"
+        options={{ title: "Deposit Method" }}
+      />
       <Stack.Screen name="deposit" options={{ title: "Deposit" }} />
+      <Stack.Screen
+        name="withdrawmethod"
+        options={{ title: "Withdraw Method" }}
+      />
       <Stack.Screen name="withdraw" options={{ title: "Withdraw" }} />
+      <Stack.Screen name="investplan" options={{ title: "Invest Method" }} />
       <Stack.Screen name="invest" options={{ title: "Invest" }} />
       <Stack.Screen name="transactions" options={{ title: "Transactions" }} />
     </Stack>

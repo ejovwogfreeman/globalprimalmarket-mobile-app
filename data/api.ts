@@ -56,6 +56,12 @@ export type AuthResponse = {
   user?: User;
 };
 
+export type DepositResponse = {
+  success: boolean;
+  message: string;
+  transaction?: any;
+};
+
 // -----------------------------
 // API Functions
 // -----------------------------
@@ -192,6 +198,32 @@ export const getProfile = async (token: string): Promise<AuthResponse> => {
         error.response?.data?.message ||
         error.message ||
         "Failed to fetch profile",
+    };
+  }
+};
+
+export const createDeposit = async (
+  token: string,
+  formData: any, // RN FormData ≠ DOM FormData
+): Promise<DepositResponse> => {
+  try {
+    const response: AxiosResponse<DepositResponse> = await api.post(
+      "/transactions/deposit",
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          // ❌ DO NOT set Content-Type
+        },
+      },
+    );
+
+    return response.data;
+  } catch (error: any) {
+    return {
+      success: false,
+      message:
+        error.response?.data?.message || error.message || "Deposit failed",
     };
   }
 };

@@ -55,12 +55,19 @@ export default function Login() {
             params: { email: res.user.email },
           });
         } else {
-          // ✅ Correctly cast res.user to User
+          // ✅ Correctly cast res.user and res.token to User
 
-          setUser(res.user);
+          const userWithToken = {
+            ...res.user,
+            token: res.token,
+          };
 
-          // ✅ Save user to AsyncStorage
-          await AsyncStorage.setItem("user", JSON.stringify(res.user));
+          // console.log(userWithToken);
+
+          setUser(userWithToken);
+
+          // ✅ Save user (with token inside)
+          await AsyncStorage.setItem("user", JSON.stringify(userWithToken));
 
           // ✅ Navigate to home
           router.replace("/home");

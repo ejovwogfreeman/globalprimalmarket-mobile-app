@@ -56,7 +56,7 @@ export default function Home() {
   };
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.safe} edges={["top"]}>
       <StatusBar style="light" />
 
       <ScrollView
@@ -93,17 +93,17 @@ export default function Home() {
         <View style={styles.actions}>
           <ActionButton
             title="Deposit"
-            route="/home/deposit"
+            route="/home/depositmethod"
             iconName="cash-outline"
           />
           <ActionButton
             title="Withdraw"
-            route="/home/withdraw"
+            route="/home/withdrawmethod"
             iconName="arrow-down-outline"
           />
           <ActionButton
             title="Invest"
-            route="/home/invest"
+            route="/home/investplan"
             iconName="trending-up-outline"
           />
           <ActionButton
@@ -177,9 +177,9 @@ function SectionTitle({ title }: SectionTitleProps) {
 type ActionButtonProps = {
   title: string;
   route:
-    | "/home/deposit"
-    | "/home/withdraw"
-    | "/home/invest"
+    | "/home/depositmethod"
+    | "/home/withdrawmethod"
+    | "/home/investplan"
     | "/home/transactions";
   iconName:
     | "cash-outline"

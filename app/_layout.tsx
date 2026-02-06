@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 import Toast from "react-native-toast-message";
 import { SignUpProvider } from "../context/SignUpContext";
+import { TransactionProvider } from "../context/TransactionContext";
 import { User, UserProvider, useUser } from "../context/UserContext";
 
 // Auth guard to redirect based on user
@@ -66,9 +67,11 @@ export default function RootLayout() {
     <SignUpProvider>
       <UserProvider>
         <AuthChecker>
-          <Stack screenOptions={{ headerShown: false }} />
-          {/* Add Toast component once in root */}
-          <Toast />
+          <TransactionProvider>
+            <Stack screenOptions={{ headerShown: false }} />
+            {/* Add Toast component once in root */}
+            <Toast />
+          </TransactionProvider>
         </AuthChecker>
       </UserProvider>
     </SignUpProvider>

@@ -40,7 +40,7 @@ export default function Settings() {
   };
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.safe} edges={["top"]}>
       <StatusBar style="light" />
       <ScrollView showsVerticalScrollIndicator={false} style={styles.container}>
         <Text style={styles.title}>Settings</Text>
