@@ -21,7 +21,7 @@ import { COUNTRIES } from "../../../data/countries";
 
 export default function Step2() {
   const router = useRouter();
-  const { signUpData, updateSignUpData } = useSignUp();
+  const { updateSignUpData } = useSignUp();
   const [country, setCountry] = useState("Select country");
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -37,6 +37,7 @@ export default function Step2() {
 
   // Get selected country object for display
   const selectedCountryObj = COUNTRIES.find((c) => c.name === country);
+  const countryFlag = selectedCountryObj ? selectedCountryObj.flag : "";
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -53,7 +54,7 @@ export default function Step2() {
           <TouchableOpacity style={styles.select} onPress={() => setOpen(true)}>
             <View style={styles.selectRow}>
               {selectedCountryObj && country !== "Select country" && (
-                <Text style={styles.flag}>{selectedCountryObj.flag}</Text>
+                <Text style={styles.flag}>{countryFlag}</Text>
               )}
               <Text
                 style={[
@@ -74,7 +75,7 @@ export default function Step2() {
             ]}
             disabled={country === "Select country"}
             onPress={() => {
-              updateSignUpData({ country }); // ✅ SAVE STEP 2 DATA
+              updateSignUpData({ country, countryFlag }); // ✅ SAVE STEP 2 DATA
               router.push("/signup/step3");
             }}
           >

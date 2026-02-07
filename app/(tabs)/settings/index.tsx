@@ -17,6 +17,14 @@ export default function Settings() {
   const router = useRouter();
   const { setUser } = useUser();
 
+  // Example counts, replace with actual fetched data
+  const counts = {
+    all: 0,
+    deposits: 0,
+    withdrawals: 0,
+    investments: 0,
+  };
+
   const handleLogout = async () => {
     try {
       // 1️⃣ Remove user from AsyncStorage
@@ -27,6 +35,7 @@ export default function Settings() {
 
       // 3️⃣ Redirect to login
       router.replace("/login");
+
       // ✅ Show logout toast
       Toast.show({
         type: "error",
@@ -45,10 +54,26 @@ export default function Settings() {
       <ScrollView showsVerticalScrollIndicator={false} style={styles.container}>
         <Text style={styles.title}>Settings</Text>
 
-        <SettingsItem title="Security" />
-        <SettingsItem title="Notifications" />
-        <SettingsItem title="Privacy Policy" />
-        <SettingsItem title="Help & Support" />
+        <SettingsItem
+          title="About"
+          onPress={() => router.push("/settings/about")}
+        />
+        <SettingsItem
+          title="Security"
+          onPress={() => router.push("/settings/security")}
+        />
+        <SettingsItem
+          title={`Notifications (${counts.all})`}
+          onPress={() => router.push("/settings/notifications")}
+        />
+        <SettingsItem
+          title="Privacy Policy"
+          onPress={() => router.push("/settings/privacypolicy")}
+        />
+        <SettingsItem
+          title="Help & Support"
+          onPress={() => router.push("/settings/helpsupport")}
+        />
 
         {/* Logout */}
         <TouchableOpacity style={styles.logout} onPress={handleLogout}>
@@ -61,11 +86,12 @@ export default function Settings() {
 
 type SettingsItemProps = {
   title: string;
+  onPress?: () => void;
 };
 
-function SettingsItem({ title }: SettingsItemProps) {
+function SettingsItem({ title, onPress }: SettingsItemProps) {
   return (
-    <TouchableOpacity style={styles.item}>
+    <TouchableOpacity style={styles.item} onPress={onPress}>
       <Text style={styles.itemText}>{title}</Text>
     </TouchableOpacity>
   );
@@ -74,12 +100,9 @@ function SettingsItem({ title }: SettingsItemProps) {
 type Styles = {
   safe: ViewStyle;
   container: ViewStyle;
-
   title: TextStyle;
-
   item: ViewStyle;
   itemText: TextStyle;
-
   logout: ViewStyle;
   logoutText: TextStyle;
 };

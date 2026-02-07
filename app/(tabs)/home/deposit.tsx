@@ -1,4 +1,5 @@
 import { useUser } from "@/context/UserContext";
+import { createDeposit } from "@/data/api";
 import { Picker } from "@react-native-picker/picker";
 import * as ImagePicker from "expo-image-picker";
 import { useLocalSearchParams } from "expo-router";
@@ -83,8 +84,58 @@ export default function Deposit() {
   };
 
   /* -------------------- SUBMIT -------------------- */
+  // const submitDeposit = async () => {
+  //   if (!amount || proofs.length === 0) {
+  //     Alert.alert("Error", "Please enter amount and upload proof");
+  //     return;
+  //   }
+
+  //   if (!user?.token) {
+  //     Alert.alert("Error", "User not authenticated");
+  //     return;
+  //   }
+
+  //   try {
+  //     setLoading(true);
+
+  //     const formData = new FormData();
+  //     formData.append("amount", amount);
+  //     formData.append("mode", method);
+
+  //     // ✅ append files correctly
+  //     proofs.forEach((uri, index) => {
+  //       formData.append("images", {
+  //         uri: proofs[0],
+  //         name: `${method}-proof-${index}.jpg`,
+  //         type: "image/jpeg",
+  //       } as any); // just 'as any' to satisfy TS
+  //     });
+
+  //     const response = await createDeposit(user.token, formData);
+
+  //     console.log(response);
+
+  //     if (!response.success) {
+  //       Alert.alert("Error", response.message);
+  //       return;
+  //     }
+
+  //     Alert.alert(
+  //       "Success",
+  //       response.message || "Deposit submitted successfully",
+  //     );
+
+  //     setAmount("");
+  //     setProofs([]);
+  //   } catch (error) {
+  //     console.log(error);
+  //     Alert.alert("Error", "Something went wrong");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   const submitDeposit = async () => {
-    console.log(proofs);
     if (!amount || proofs.length === 0) {
       Alert.alert("Error", "Please enter amount and upload proof");
       return;
@@ -98,25 +149,34 @@ export default function Deposit() {
     try {
       setLoading(true);
 
+      // Create FormData
       const formData = new FormData();
-      formData.append("amount", amount);
+      formData.append("amount", amount.toString());
       formData.append("mode", method);
 
-      // ✅ append files correctly
+      // Append each image properly
       proofs.forEach((uri, index) => {
+        const fileName = uri.split("/").pop() || `proof-${index}.jpg`;
         formData.append("images", {
-          uri: proofs[0],
-          name: `${method}-proof-${index}.jpg`,
-          type: "image/jpeg",
-        } as any); // just 'as any' to satisfy TS
+          uri, // must include file://
+          name: fileName, // filename
+          type: "image/jpeg", // MIME type
+        } as any);
       });
 
+      // Debug: log FormData keys
+      // for (let pair of formData.entries()) {
+      //   console.log(pair[0], pair[1]);
+      // }
+
+      // Send to backend
       const response = await createDeposit(user.token, formData);
 
-      console.log(response);
+      console.log("API response:", response);
 
+      // ✅ Fix: response itself is already the data
       if (!response.success) {
-        Alert.alert("Error", response.message);
+        Alert.alert("Error", response.message || "Deposit failed");
         return;
       }
 
@@ -127,7 +187,8 @@ export default function Deposit() {
 
       setAmount("");
       setProofs([]);
-    } catch (error) {
+    } catch (err: any) {
+      console.log("Deposit error:", err);
       Alert.alert("Error", "Something went wrong");
     } finally {
       setLoading(false);

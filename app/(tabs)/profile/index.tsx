@@ -1,4 +1,5 @@
 import { useUser } from "@/context/UserContext";
+import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React, { ReactNode } from "react";
 import {
@@ -13,6 +14,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Profile() {
+  const router = useRouter();
   const { user } = useUser();
 
   if (!user) {
@@ -42,7 +44,11 @@ export default function Profile() {
         <View style={styles.card}>
           <ProfileRow label="Email" value={user.email} />
           <ProfileRow label="Phone" value={user.phoneNumber} />
-          <ProfileRow label="Country" value={user.country} />
+          <ProfileRow
+            label="Country"
+            countryFlag={user.countryFlag}
+            value={user.country}
+          />
           <ProfileRow label="Account Type" value={user.role} />
           <ProfileRow
             label="Verified"
@@ -56,7 +62,10 @@ export default function Profile() {
         </View>
 
         {/* Button */}
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => router.push("/profile/editprofile")}
+        >
           <Text style={styles.buttonText}>Edit Profile</Text>
         </TouchableOpacity>
       </ScrollView>
@@ -66,11 +75,12 @@ export default function Profile() {
 
 type ProfileRowProps = {
   label: string;
+  countryFlag?: string;
   value: string | ReactNode;
   isLast?: boolean;
 };
 
-function ProfileRow({ label, value, isLast }: ProfileRowProps) {
+function ProfileRow({ label, value, countryFlag, isLast }: ProfileRowProps) {
   return (
     <View
       style={[
@@ -79,7 +89,17 @@ function ProfileRow({ label, value, isLast }: ProfileRowProps) {
       ]}
     >
       <Text style={styles.rowLabel}>{label}</Text>
-      <Text style={styles.rowValue}>{value}</Text>
+
+      <View style={styles.valueContainer}>
+        {countryFlag && <Text style={styles.countryFlag}>{countryFlag}</Text>}
+
+        {/* Render string inside Text, else render ReactNode directly */}
+        {typeof value === "string" ? (
+          <Text style={styles.rowValue}>{value}</Text>
+        ) : (
+          value
+        )}
+      </View>
     </View>
   );
 }
@@ -109,6 +129,8 @@ type Styles = {
   card: ViewStyle;
   row: ViewStyle;
   rowLabel: TextStyle;
+  valueContainer: ViewStyle;
+  countryFlag: TextStyle;
   rowValue: TextStyle;
   badge: ViewStyle;
   badgeText: TextStyle;
@@ -175,12 +197,19 @@ const styles = StyleSheet.create<Styles>({
     fontSize: 12,
     marginBottom: 5,
   },
+  valueContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingBottom: 6,
+    marginBottom: 6,
+  },
+  countryFlag: {
+    marginRight: 5,
+  },
   rowValue: {
     color: "#f8fafc",
     fontSize: 15,
     fontWeight: "500",
-    paddingBottom: 6,
-    marginBottom: 6,
   },
   badge: {
     paddingHorizontal: 10,

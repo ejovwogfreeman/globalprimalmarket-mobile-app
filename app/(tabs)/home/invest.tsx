@@ -1,8 +1,11 @@
+import { useUser } from "@/context/UserContext";
+import { createInvestment } from "@/data/api";
 import { Picker } from "@react-native-picker/picker";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React, { useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   ScrollView,
   StyleSheet,
@@ -12,6 +15,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 
 const PLANS = [
   { id: "starter", name: "Starter", min: 50 },
@@ -23,6 +27,7 @@ const PLANS = [
 ];
 
 export default function Invest() {
+  const router = useRouter();
   const params = useLocalSearchParams();
 
   // Get plan from params if exists, otherwise default
@@ -30,10 +35,12 @@ export default function Invest() {
 
   const [plan, setPlan] = useState(initialPlan);
   const [amount, setAmount] = useState("");
+  const [loading, setLoading] = useState(false);
 
+  const { user } = useUser();
   const selectedPlan = PLANS.find((p) => p.id === plan)!;
 
-  const submitInvestment = () => {
+  const submitInvestment = async () => {
     if (!amount) {
       Alert.alert("Error", "Please enter an investment amount");
       return;
@@ -47,16 +54,53 @@ export default function Invest() {
       return;
     }
 
-    // SEND TO BACKEND HERE
-    console.log({
-      plan,
-      amount,
-    });
+    if (!user?.token) {
+      Alert.alert("Error", "User not authenticated");
+      return;
+    }
 
-    Alert.alert(
-      "Investment Submitted",
-      "Your investment request has been submitted successfully.",
-    );
+    try {
+      setLoading(true);
+
+      const payload = {
+        plan, // plan id like "starter", "silver", etc.
+        amount: Number(amount),
+      };
+
+      const response = await createInvestment(user.token, payload);
+
+      console.log("Investment response:", response);
+
+      if (!response.success) {
+        Alert.alert("Error", response.message || "Investment failed");
+        return;
+      }
+
+      // Alert.alert(
+      //   "Success",
+      //   response.message ||
+      //     "Your investment request has been submitted successfully",
+      // );
+
+      router.replace("/home");
+      // ✅ Show login success toast
+      Toast.show({
+        type: "success",
+        text1: "Investment Successful",
+        text2:
+          response.message ||
+          "Your investment request has been submitted successfully",
+        position: "top",
+      });
+
+      // Reset form
+      setAmount("");
+    } catch (err: any) {
+      console.log("Investment error:", err);
+      Alert.alert("Error", "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -98,8 +142,16 @@ export default function Invest() {
         />
 
         {/* Submit */}
-        <TouchableOpacity style={styles.submitBtn} onPress={submitInvestment}>
-          <Text style={styles.submitText}>Submit Investment</Text>
+        <TouchableOpacity
+          style={[styles.submitBtn, loading && { opacity: 0.7 }]}
+          onPress={submitInvestment}
+          disabled={loading} // prevent double submission
+        >
+          {loading ? (
+            <ActivityIndicator size="small" color="#ffffff" />
+          ) : (
+            <Text style={styles.submitText}>Submit Investment</Text>
+          )}
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>

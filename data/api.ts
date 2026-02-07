@@ -22,6 +22,7 @@ export type RegisterData = {
   email: string;
   phoneNumber: string;
   country: string;
+  countryFlag: string;
   password: string;
 };
 
@@ -60,6 +61,55 @@ export type DepositResponse = {
   success: boolean;
   message: string;
   transaction?: any;
+};
+
+export type WithdrawalResponse = {
+  success: boolean;
+  message: string;
+  transaction?: any;
+};
+
+export type InvestResponse = {
+  success: boolean;
+  message: string;
+  transaction?: any;
+};
+
+export interface Transaction {
+  _id: string;
+  type: "deposit" | "withdrawal" | "investment";
+  amount: number;
+  status: "pending" | "in progress " | "approved" | "rejected";
+  mode?: string;
+  wallet?: string;
+  createdAt: string;
+  token: string;
+}
+
+interface TransactionsResponse {
+  success: boolean;
+  message?: string;
+  count?: number;
+  transactions?: Transaction[];
+}
+
+type TransactionResponse = {
+  success: boolean;
+  transaction?: Transaction;
+  message?: string;
+};
+
+export type UpdateProfileResponse = {
+  success: boolean;
+  message?: string;
+  user?: {
+    userName: string;
+    fullName: string;
+    email: string;
+    phone: string;
+    country: string;
+    countryFlag: string;
+  };
 };
 
 // -----------------------------
@@ -224,6 +274,143 @@ export const createDeposit = async (
       success: false,
       message:
         error.response?.data?.message || error.message || "Deposit failed",
+    };
+  }
+};
+
+export const createWithdrawal = async (
+  token: string,
+  payload: { amount: number; mode: string; wallet: string },
+): Promise<WithdrawalResponse> => {
+  try {
+    const response: AxiosResponse<WithdrawalResponse> = await api.post(
+      "/transactions/withdrawal",
+      payload, // send JSON
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      },
+    );
+
+    return response.data;
+  } catch (error: any) {
+    return {
+      success: false,
+      message:
+        error.response?.data?.message || error.message || "Withdrawal failed",
+    };
+  }
+};
+
+export const createInvestment = async (
+  token: string,
+  payload: { amount: number; plan: string },
+): Promise<InvestResponse> => {
+  try {
+    const response: AxiosResponse<InvestResponse> = await api.post(
+      "/transactions/withdrawal",
+      payload, // send JSON
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      },
+    );
+
+    return response.data;
+  } catch (error: any) {
+    return {
+      success: false,
+      message:
+        error.response?.data?.message || error.message || "Withdrawal failed",
+    };
+  }
+};
+
+export const getMyTransactions = async (
+  token: string,
+): Promise<TransactionsResponse> => {
+  try {
+    const response: AxiosResponse<TransactionsResponse> = await api.get(
+      "/transactions/me",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+
+    return response.data;
+  } catch (error: any) {
+    return {
+      success: false,
+      message:
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to fetch transactions",
+    };
+  }
+};
+
+export const getTransactionById = async (
+  token: string,
+  transactionId: string,
+): Promise<TransactionResponse> => {
+  try {
+    const response: AxiosResponse<TransactionResponse> = await api.get(
+      `/transactions/${transactionId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+
+    return response.data;
+  } catch (error: any) {
+    return {
+      success: false,
+      message:
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to fetch transaction",
+    };
+  }
+};
+
+export const updateUserProfile = async (
+  token: string,
+  payload: {
+    userName: string;
+    fullName: string;
+    phoneNumber: string;
+    country: string;
+    countryFlag: string;
+  },
+): Promise<UpdateProfileResponse> => {
+  try {
+    const response = await api.put<UpdateProfileResponse>(
+      "/user/update-profile", // adjust this to your backend route
+      payload,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      },
+    );
+
+    return response.data;
+  } catch (error: any) {
+    return {
+      success: false,
+      message:
+        error.response?.data?.message ||
+        error.message ||
+        "Profile update failed",
     };
   }
 };

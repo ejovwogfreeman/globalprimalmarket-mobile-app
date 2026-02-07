@@ -55,6 +55,7 @@ export default function Step3() {
       email: signUpData.email,
       phoneNumber: signUpData.phoneNumber,
       country: signUpData.country,
+      countryFlag: signUpData.countryFlag,
       password: password,
     };
 

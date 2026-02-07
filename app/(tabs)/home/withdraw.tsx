@@ -1,8 +1,11 @@
+import { useUser } from "@/context/UserContext";
+import { createWithdrawal } from "@/data/api";
 import { Picker } from "@react-native-picker/picker";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React, { useState } from "react";
 import {
+  ActivityIndicator,
   Alert,
   ScrollView,
   StyleSheet,
@@ -12,6 +15,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 
 const CRYPTOS = {
   btc: { name: "Bitcoin", symbol: "BTC" },
@@ -21,32 +25,74 @@ const CRYPTOS = {
   bnb: { name: "BNB Smart Chain", symbol: "BNB" },
   xrp: { name: "Ripple", symbol: "XRP" },
 };
-
 export default function Withdraw() {
+  const router = useRouter();
   const params = useLocalSearchParams();
   const initialMethod = (params.method as keyof typeof CRYPTOS) || "btc";
 
   const [method, setMethod] = useState(initialMethod);
   const [amount, setAmount] = useState("");
   const [wallet, setWallet] = useState("");
+  const [loading, setLoading] = useState(false);
 
+  const { user } = useUser();
   const crypto = CRYPTOS[method];
 
-  const submitWithdraw = () => {
+  const submitWithdraw = async () => {
     if (!amount || !wallet) {
-      Alert.alert("Error", "Please fill all fields");
+      Alert.alert("Error", "Please enter amount and wallet address");
       return;
     }
 
-    // SEND TO BACKEND HERE
-    console.log({
-      type: "withdraw",
-      method,
-      amount,
-      wallet,
-    });
+    if (!user?.token) {
+      Alert.alert("Error", "User not authenticated");
+      return;
+    }
 
-    Alert.alert("Success", "Withdrawal request submitted successfully");
+    try {
+      setLoading(true);
+
+      // Prepare payload
+      const payload = {
+        amount: Number(amount),
+        mode: method, // selected crypto method
+        wallet, // wallet address
+      };
+
+      // Send to backend
+      const response = await createWithdrawal(user.token, payload);
+
+      console.log("Withdrawal response:", response);
+
+      if (!response.success) {
+        Alert.alert("Error", response.message || "Withdrawal failed");
+        return;
+      }
+
+      // Alert.alert(
+      //   "Success",
+      //   response.message || "Withdrawal request submitted successfully",
+      // );
+
+      router.replace("/home");
+      // ✅ Show login success toast
+      Toast.show({
+        type: "success",
+        text1: "Withdrawal Successful",
+        text2:
+          response.message || "Your withdrawal request submitted successfully",
+        position: "top",
+      });
+
+      // Reset fields
+      setAmount("");
+      setWallet("");
+    } catch (err: any) {
+      console.log("Withdrawal error:", err);
+      Alert.alert("Error", "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -97,8 +143,16 @@ export default function Withdraw() {
         />
 
         {/* Submit */}
-        <TouchableOpacity style={styles.submitBtn} onPress={submitWithdraw}>
-          <Text style={styles.submitText}>Submit Withdrawal</Text>
+        <TouchableOpacity
+          style={[styles.submitBtn, loading && { opacity: 0.7 }]}
+          onPress={submitWithdraw}
+          disabled={loading} // prevent double submission
+        >
+          {loading ? (
+            <ActivityIndicator size="small" color="#ffffff" />
+          ) : (
+            <Text style={styles.submitText}>Submit Withdrawal</Text>
+          )}
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>

@@ -12,7 +12,10 @@ export default function TabsLayout() {
    * ["(tabs)", "profile"] → SHOW tabs
    */
 
-  const hideTabs = segments[1] === "home" && segments.length > 2;
+  const hideTabs =
+    (segments[1] === "home" && segments.length > 2) ||
+    (segments[1] === "profile" && segments.length > 2) ||
+    (segments[1] === "settings" && segments.length > 2);
 
   return (
     <View style={{ flex: 1, backgroundColor: "#020617" }}>

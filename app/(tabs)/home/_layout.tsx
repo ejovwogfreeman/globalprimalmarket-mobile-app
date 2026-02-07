@@ -25,6 +25,10 @@ export default function HomeStackLayout() {
       <Stack.Screen name="withdraw" options={{ title: "Withdraw" }} />
       <Stack.Screen name="investplan" options={{ title: "Invest Method" }} />
       <Stack.Screen name="invest" options={{ title: "Invest" }} />
+      <Stack.Screen
+        name="transaction"
+        options={{ title: "Transaction Details" }}
+      />
       <Stack.Screen name="transactions" options={{ title: "Transactions" }} />
     </Stack>
   );

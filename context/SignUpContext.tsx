@@ -8,6 +8,7 @@ interface SignUpData {
   email: string;
   phoneNumber: string;
   country: string;
+  countryFlag: string;
   password: string;
 }
 
@@ -33,6 +34,7 @@ export const SignUpProvider: React.FC<SignUpProviderProps> = ({ children }) => {
     email: "",
     phoneNumber: "",
     country: "",
+    countryFlag: "",
     password: "",
   });
 
