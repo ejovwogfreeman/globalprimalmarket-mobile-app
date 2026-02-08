@@ -15,6 +15,10 @@ export default function ProfileStackLayout() {
         name="editprofile"
         options={{ headerShown: false, title: "" }}
       />
+      <Stack.Screen
+        name="changephoto"
+        options={{ headerShown: false, title: "" }}
+      />
     </Stack>
   );
 }

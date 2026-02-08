@@ -1,4 +1,5 @@
 import { useUser } from "@/context/UserContext";
+import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React, { ReactNode } from "react";
@@ -27,14 +28,26 @@ export default function Profile() {
 
       <ScrollView showsVerticalScrollIndicator={false} style={styles.container}>
         {/* Header */}
+
         <View style={styles.profileHeader}>
           <Text style={styles.title}>Profile</Text>
-          {/* Avatar */}
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>
-              {user.userName?.charAt(0).toUpperCase()}
-            </Text>
+
+          {/* Avatar with Edit Icon */}
+          <View style={styles.avatarWrapper}>
+            <View style={styles.avatar}>
+              <Text style={styles.avatarText}>
+                {user.userName?.charAt(0).toUpperCase()}
+              </Text>
+            </View>
+
+            <TouchableOpacity
+              style={styles.editIcon}
+              onPress={() => router.push("/profile/changephoto")}
+            >
+              <MaterialIcons name="edit" size={20} color="#fff" />
+            </TouchableOpacity>
           </View>
+
           {/* User Info */}
           <Text style={styles.name}>{user.fullName}</Text>
           <Text style={styles.username}>@{user.userName}</Text>
@@ -121,6 +134,8 @@ type Styles = {
   safe: ViewStyle;
   container: ViewStyle;
   profileHeader: ViewStyle;
+  avatarWrapper: ViewStyle;
+  editIcon: ViewStyle;
   title: TextStyle;
   avatar: ViewStyle;
   avatarText: TextStyle;
@@ -150,6 +165,20 @@ const styles = StyleSheet.create<Styles>({
   },
   profileHeader: {
     alignItems: "center",
+  },
+  avatarWrapper: {
+    position: "relative",
+    marginBottom: 12,
+  },
+  editIcon: {
+    position: "absolute",
+    bottom: 0,
+    right: 0,
+    backgroundColor: "#2563eb",
+    borderRadius: 12,
+    padding: 4,
+    borderWidth: 2,
+    borderColor: "#020617", // optional: border to separate icon from avatar
   },
   title: {
     color: "#f8fafc",
