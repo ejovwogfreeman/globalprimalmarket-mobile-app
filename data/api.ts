@@ -263,7 +263,7 @@ export const createDeposit = async (
       {
         headers: {
           Authorization: `Bearer ${token}`,
-          // ❌ DO NOT set Content-Type
+          "Content-Type": "multipart/form-data",
         },
       },
     );
