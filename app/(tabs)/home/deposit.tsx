@@ -83,58 +83,6 @@ export default function Deposit() {
     }
   };
 
-  /* -------------------- SUBMIT -------------------- */
-  // const submitDeposit = async () => {
-  //   if (!amount || proofs.length === 0) {
-  //     Alert.alert("Error", "Please enter amount and upload proof");
-  //     return;
-  //   }
-
-  //   if (!user?.token) {
-  //     Alert.alert("Error", "User not authenticated");
-  //     return;
-  //   }
-
-  //   try {
-  //     setLoading(true);
-
-  //     const formData = new FormData();
-  //     formData.append("amount", amount);
-  //     formData.append("mode", method);
-
-  //     // ✅ append files correctly
-  //     proofs.forEach((uri, index) => {
-  //       formData.append("images", {
-  //         uri: proofs[0],
-  //         name: `${method}-proof-${index}.jpg`,
-  //         type: "image/jpeg",
-  //       } as any); // just 'as any' to satisfy TS
-  //     });
-
-  //     const response = await createDeposit(user.token, formData);
-
-  //     console.log(response);
-
-  //     if (!response.success) {
-  //       Alert.alert("Error", response.message);
-  //       return;
-  //     }
-
-  //     Alert.alert(
-  //       "Success",
-  //       response.message || "Deposit submitted successfully",
-  //     );
-
-  //     setAmount("");
-  //     setProofs([]);
-  //   } catch (error) {
-  //     console.log(error);
-  //     Alert.alert("Error", "Something went wrong");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
   const submitDeposit = async () => {
     if (!amount || proofs.length === 0) {
       Alert.alert("Error", "Please enter amount and upload proof");

@@ -1,7 +1,9 @@
 import { useUser } from "@/context/UserContext";
+import { getMyTransactions, Transaction } from "@/data/api";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
+import { useEffect, useState } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -15,37 +17,43 @@ import Toast from "react-native-toast-message";
 
 export default function Settings() {
   const router = useRouter();
-  const { setUser } = useUser();
+  const { setUser, user } = useUser();
 
-  // Example counts, replace with actual fetched data
-  const counts = {
-    all: 0,
-    deposits: 0,
-    withdrawals: 0,
-    investments: 0,
-  };
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const token = user?.token;
+    if (!token) return;
+
+    const fetchTransactions = async () => {
+      setLoading(true);
+      const res = await getMyTransactions(token);
+
+      if (res.success && res.transactions) {
+        setTransactions(res.transactions);
+      }
+
+      setLoading(false);
+    };
+
+    fetchTransactions();
+  }, [user?.token]);
+
+  // ✅ TOTAL TRANSACTION COUNT
+  const transactionCount = transactions.length;
 
   const handleLogout = async () => {
-    try {
-      // 1️⃣ Remove user from AsyncStorage
-      await AsyncStorage.removeItem("user");
+    await AsyncStorage.removeItem("user");
+    setUser(null);
+    router.replace("/login");
 
-      // 2️⃣ Clear user in context
-      setUser(null);
-
-      // 3️⃣ Redirect to login
-      router.replace("/login");
-
-      // ✅ Show logout toast
-      Toast.show({
-        type: "error",
-        text1: "Logged Out",
-        text2: "You have successfully logged out.",
-        position: "top",
-      });
-    } catch (err) {
-      console.log("Logout error:", err);
-    }
+    Toast.show({
+      type: "error",
+      text1: "Logged Out",
+      text2: "You have successfully logged out.",
+      position: "top",
+    });
   };
 
   return (
@@ -58,24 +66,32 @@ export default function Settings() {
           title="About"
           onPress={() => router.push("/settings/about")}
         />
+
         <SettingsItem
           title="Security"
           onPress={() => router.push("/settings/security")}
         />
+
+        {/* ✅ TRANSACTION COUNT ONLY */}
         <SettingsItem
-          title={`Notifications (${counts.all})`}
+          title={
+            loading
+              ? "Notifications (...)"
+              : `Notifications (${transactionCount})`
+          }
           onPress={() => router.push("/settings/notifications")}
         />
+
         <SettingsItem
           title="Privacy Policy"
           onPress={() => router.push("/settings/privacypolicy")}
         />
+
         <SettingsItem
           title="Help & Support"
           onPress={() => router.push("/settings/helpsupport")}
         />
 
-        {/* Logout */}
         <TouchableOpacity style={styles.logout} onPress={handleLogout}>
           <Text style={styles.logoutText}>Log Out</Text>
         </TouchableOpacity>
