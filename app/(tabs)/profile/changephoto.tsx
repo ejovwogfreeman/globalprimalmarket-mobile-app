@@ -1,4 +1,5 @@
 import { useUser } from "@/context/UserContext";
+import { changeProfilePicture } from "@/data/api";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -17,12 +18,13 @@ import {
   ViewStyle,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 
 export default function ChangePhoto() {
   const router = useRouter();
   const { user, setUser } = useUser();
-  const [photoUri, setPhotoUri] = useState<string | null>(
-    user?.profilePicture || null,
+  const [photoUri, setPhotoUri] = useState<string[]>(
+    user?.profilePicture ? [user.profilePicture] : [],
   );
   const [loading, setLoading] = useState(false);
 
@@ -30,33 +32,69 @@ export default function ChangePhoto() {
 
   const pickPhoto = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ["images"], // works across all SDKs
       quality: 0.7,
     });
 
-    if (!result.canceled) setPhotoUri(result.assets[0].uri);
+    if (!result.canceled) {
+      setPhotoUri([result.assets[0].uri]);
+    }
   };
 
   const submitPhoto = async () => {
-    if (!photoUri) {
+    if (!photoUri || photoUri.length === 0) {
       Alert.alert("Error", "Please select a photo");
+      return;
+    }
+
+    if (!user?.token) {
+      Alert.alert("Error", "User not authenticated");
       return;
     }
 
     try {
       setLoading(true);
 
-      // Replace with actual upload API call if needed
-      // Example: await uploadAvatar(user.token, photoUri);
+      // Create FormData
+      const formData = new FormData();
 
-      // Update user context locally
+      // Append each image in the array (even if usually 1)
+      photoUri.forEach((uri, index) => {
+        const fileName = uri.split("/").pop() || `profile-${index}.jpg`;
+        formData.append("profilePicture", {
+          uri,
+          name: fileName,
+          type: "image/jpeg", // adjust type if needed
+        } as any);
+      });
+
+      // Send to backend
+      const response = await changeProfilePicture(user.token, formData);
+
+      console.log("Profile picture API response:", response);
+
+      if (!response.success) {
+        Alert.alert(
+          "Error",
+          response.message || "Failed to update profile picture",
+        );
+        return;
+      }
+
+      // Update user context with new profile picture array
       setUser({ ...user, profilePicture: photoUri });
 
-      Alert.alert("Success", "Profile photo updated!");
+      Toast.show({
+        type: "success",
+        text1: "Profile Updated",
+        text2: "Your profile picture has been updated successfully",
+        position: "top",
+      });
+
       router.push("/profile"); // Redirect back to profile
     } catch (err) {
       console.log("Update photo error:", err);
-      Alert.alert("Error", "Could not update photo");
+      Alert.alert("Error", "Could not update profile picture");
     } finally {
       setLoading(false);
     }
@@ -71,7 +109,7 @@ export default function ChangePhoto() {
         {/* Avatar Preview */}
         <View style={styles.avatarWrapper}>
           {photoUri ? (
-            <Image source={{ uri: photoUri }} style={styles.avatar} />
+            <Image source={{ uri: photoUri[0] }} style={styles.avatar} />
           ) : (
             <View style={styles.avatar}>
               <Text style={styles.avatarText}>

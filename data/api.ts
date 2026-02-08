@@ -112,6 +112,12 @@ export type UpdateProfileResponse = {
   };
 };
 
+interface ChangeProfilePictureResponse {
+  success: boolean;
+  message: string;
+  profilePicture?: string; // URL of uploaded image
+}
+
 // -----------------------------
 // API Functions
 // -----------------------------
@@ -411,6 +417,31 @@ export const updateUserProfile = async (
         error.response?.data?.message ||
         error.message ||
         "Profile update failed",
+    };
+  }
+};
+
+export const changeProfilePicture = async (
+  token: string,
+  formData: FormData, // RN FormData
+): Promise<ChangeProfilePictureResponse> => {
+  try {
+    const response: AxiosResponse<ChangeProfilePictureResponse> =
+      await api.post("/users/change-profile-picture", formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+    return response.data;
+  } catch (error: any) {
+    return {
+      success: false,
+      message:
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to update profile picture",
     };
   }
 };

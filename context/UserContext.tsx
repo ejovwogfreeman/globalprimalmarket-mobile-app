@@ -14,7 +14,7 @@ export interface User {
   role: string;
   createdAt?: string;
   token?: string;
-  profilePicture?: string;
+  profilePicture?: any;
 }
 
 interface UserContextType {
