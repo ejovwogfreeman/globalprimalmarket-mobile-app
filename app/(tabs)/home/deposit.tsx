@@ -2,7 +2,7 @@ import { useUser } from "@/context/UserContext";
 import { createDeposit } from "@/data/api";
 import { Picker } from "@react-native-picker/picker";
 import * as ImagePicker from "expo-image-picker";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React, { useState } from "react";
 import {
@@ -18,6 +18,7 @@ import {
 } from "react-native";
 import QRCode from "react-native-qrcode-svg";
 import { SafeAreaView } from "react-native-safe-area-context";
+import Toast from "react-native-toast-message";
 
 /* -------------------- CRYPTO DATA -------------------- */
 const CRYPTOS = {
@@ -60,6 +61,7 @@ const CRYPTOS = {
 };
 
 export default function Deposit() {
+  const router = useRouter();
   const params = useLocalSearchParams();
   const initialMethod = (params.method as keyof typeof CRYPTOS) || "btc";
 
@@ -128,10 +130,21 @@ export default function Deposit() {
         return;
       }
 
-      Alert.alert(
-        "Success",
-        response.message || "Deposit submitted successfully",
-      );
+      // Alert.alert(
+      //   "Success",
+      //   response.message || "Deposit submitted successfully",
+      // );
+
+      router.replace("/home");
+      // ✅ Show login success toast
+      Toast.show({
+        type: "success",
+        text1: "Investment Successful",
+        text2:
+          response.message ||
+          "Your investment request has been submitted successfully",
+        position: "top",
+      });
 
       setAmount("");
       setProofs([]);
