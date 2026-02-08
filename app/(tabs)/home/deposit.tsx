@@ -139,7 +139,7 @@ export default function Deposit() {
       // ✅ Show login success toast
       Toast.show({
         type: "success",
-        text1: "",
+        text1: "Deposit Successful",
         text2:
           response.message ||
           "Your deposit request has been submitted successfully",

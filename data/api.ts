@@ -325,7 +325,7 @@ export const createInvestment = async (
     return {
       success: false,
       message:
-        error.response?.data?.message || error.message || "Withdrawal failed",
+        error.response?.data?.message || error.message || "Investment Failed",
     };
   }
 };
