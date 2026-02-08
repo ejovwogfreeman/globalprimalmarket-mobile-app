@@ -24,7 +24,7 @@ export default function ChangePhoto() {
   const router = useRouter();
   const { user, setUser } = useUser();
   const [photoUri, setPhotoUri] = useState<string[]>(
-    user?.profilePicture ? [user.profilePicture] : [],
+    user?.profilePicture ? user.profilePicture : [],
   );
   const [loading, setLoading] = useState(false);
 
@@ -40,6 +40,8 @@ export default function ChangePhoto() {
       setPhotoUri([result.assets[0].uri]);
     }
   };
+
+  console.log(photoUri);
 
   const submitPhoto = async () => {
     if (!photoUri || photoUri.length === 0) {
@@ -61,7 +63,7 @@ export default function ChangePhoto() {
       // Append each image in the array (even if usually 1)
       photoUri.forEach((uri, index) => {
         const fileName = uri.split("/").pop() || `profile-${index}.jpg`;
-        formData.append("profilePicture", {
+        formData.append("images", {
           uri,
           name: fileName,
           type: "image/jpeg", // adjust type if needed
@@ -103,12 +105,18 @@ export default function ChangePhoto() {
   return (
     <SafeAreaView style={styles.safe} edges={["top"]}>
       <StatusBar style="light" />
+
+      {/* Go Back Button */}
+      <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
+        <Text style={styles.backText}>← Back</Text>
+      </TouchableOpacity>
+
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.title}>Change Profile Photo</Text>
 
         {/* Avatar Preview */}
         <View style={styles.avatarWrapper}>
-          {photoUri ? (
+          {photoUri && photoUri.length > 0 ? (
             <Image source={{ uri: photoUri[0] }} style={styles.avatar} />
           ) : (
             <View style={styles.avatar}>
@@ -142,6 +150,8 @@ export default function ChangePhoto() {
 
 const styles = StyleSheet.create<{
   safe: ViewStyle;
+  backBtn: ViewStyle;
+  backText: TextStyle;
   container: ViewStyle;
   title: TextStyle;
   avatarWrapper: ViewStyle;
@@ -153,6 +163,16 @@ const styles = StyleSheet.create<{
   buttonText: TextStyle;
 }>({
   safe: { flex: 1, backgroundColor: "#020617" },
+  backBtn: {
+    padding: 16,
+    marginLeft: 4,
+  },
+  backText: {
+    color: "#38bdf8",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+
   container: { padding: 24, alignItems: "center" },
   title: {
     color: "#f8fafc",

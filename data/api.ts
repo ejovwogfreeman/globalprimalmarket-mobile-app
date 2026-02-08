@@ -427,7 +427,7 @@ export const changeProfilePicture = async (
 ): Promise<ChangeProfilePictureResponse> => {
   try {
     const response: AxiosResponse<ChangeProfilePictureResponse> =
-      await api.post("/users/change-profile-picture", formData, {
+      await api.post("/user/change-profile-picture", formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
