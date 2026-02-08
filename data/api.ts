@@ -310,7 +310,7 @@ export const createInvestment = async (
 ): Promise<InvestResponse> => {
   try {
     const response: AxiosResponse<InvestResponse> = await api.post(
-      "/transactions/withdrawal",
+      "/transactions/investment",
       payload, // send JSON
       {
         headers: {
