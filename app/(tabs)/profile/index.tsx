@@ -2,8 +2,10 @@ import { useUser } from "@/context/UserContext";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import React, { ReactNode } from "react";
+import React, { ReactNode, useState } from "react";
 import {
+  Image,
+  ImageStyle,
   ScrollView,
   StyleSheet,
   Text,
@@ -22,6 +24,20 @@ export default function Profile() {
     return null; // or loader
   }
 
+  const [photoUri, setPhotoUri] = useState<string[]>(
+    user?.profilePicture ? user.profilePicture : [],
+  );
+
+  React.useEffect(() => {
+    if (user?.profilePicture) {
+      setPhotoUri(
+        Array.isArray(user.profilePicture)
+          ? user.profilePicture
+          : [user.profilePicture],
+      );
+    }
+  }, [user]);
+
   return (
     <SafeAreaView style={styles.safe} edges={["top"]}>
       <StatusBar style="light" />
@@ -34,11 +50,15 @@ export default function Profile() {
 
           {/* Avatar with Edit Icon */}
           <View style={styles.avatarWrapper}>
-            <View style={styles.avatar}>
-              <Text style={styles.avatarText}>
-                {user.userName?.charAt(0).toUpperCase()}
-              </Text>
-            </View>
+            {photoUri && photoUri.length > 0 ? (
+              <Image source={{ uri: photoUri[0] }} style={styles.avatar} />
+            ) : (
+              <View style={styles.avatar}>
+                <Text style={styles.avatarText}>
+                  {user.userName?.charAt(0).toUpperCase()}
+                </Text>
+              </View>
+            )}
 
             <TouchableOpacity
               style={styles.editIcon}
@@ -137,7 +157,7 @@ type Styles = {
   avatarWrapper: ViewStyle;
   editIcon: ViewStyle;
   title: TextStyle;
-  avatar: ViewStyle;
+  avatar: ImageStyle; // ✅ Correct type for Image
   avatarText: TextStyle;
   name: TextStyle;
   username: TextStyle;

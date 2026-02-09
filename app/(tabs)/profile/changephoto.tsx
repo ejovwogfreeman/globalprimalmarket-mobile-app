@@ -1,5 +1,6 @@
 import { useUser } from "@/context/UserContext";
 import { changeProfilePicture } from "@/data/api";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -23,12 +24,11 @@ import Toast from "react-native-toast-message";
 export default function ChangePhoto() {
   const router = useRouter();
   const { user, setUser } = useUser();
+  if (!user) return null;
   const [photoUri, setPhotoUri] = useState<string[]>(
     user?.profilePicture ? user.profilePicture : [],
   );
   const [loading, setLoading] = useState(false);
-
-  if (!user) return null;
 
   const pickPhoto = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -41,7 +41,7 @@ export default function ChangePhoto() {
     }
   };
 
-  console.log(photoUri);
+  // console.log(photoUri);
 
   const submitPhoto = async () => {
     if (!photoUri || photoUri.length === 0) {
@@ -83,8 +83,9 @@ export default function ChangePhoto() {
         return;
       }
 
-      // Update user context with new profile picture array
-      setUser({ ...user, profilePicture: photoUri });
+      // Update user context
+      const updatedUser = { ...user, profilePicture: photoUri };
+      setUser(updatedUser);
 
       Toast.show({
         type: "success",
@@ -92,6 +93,12 @@ export default function ChangePhoto() {
         text2: "Your profile picture has been updated successfully",
         position: "top",
       });
+
+      // ✅ Save updated user to AsyncStorage
+      await AsyncStorage.setItem("user", JSON.stringify(updatedUser));
+
+      // Navigate back to profile
+      router.replace("/profile");
 
       router.push("/profile"); // Redirect back to profile
     } catch (err) {

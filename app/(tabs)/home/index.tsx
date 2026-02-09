@@ -2,8 +2,10 @@ import { useUser } from "@/context/UserContext";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
+  Image,
+  ImageStyle,
   ScrollView,
   StyleSheet,
   Text,
@@ -16,6 +18,23 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Home() {
   const { user } = useUser(); // ✅ get user from context
+
+  if (!user) {
+    return null; // or loader
+  }
+  const [photoUri, setPhotoUri] = useState<string[]>(
+    user?.profilePicture ? user.profilePicture : [],
+  );
+
+  React.useEffect(() => {
+    if (user?.profilePicture) {
+      setPhotoUri(
+        Array.isArray(user.profilePicture)
+          ? user.profilePicture
+          : [user.profilePicture],
+      );
+    }
+  }, [user]);
 
   useEffect(() => {
     // console.log("Logged-in user:", user); // ✅ check the user
@@ -71,11 +90,20 @@ export default function Home() {
             <Text style={styles.welcome}>{getFormattedDateTime()}</Text>
           </View>
 
-          <TouchableOpacity style={styles.profile}>
+          {/* <View style={styles.profile}>
             <Text style={styles.profileText}>
               {user?.userName?.charAt(0).toUpperCase()}
             </Text>
-          </TouchableOpacity>
+          </View> */}
+          <View style={styles.profile}>
+            {photoUri && photoUri.length > 0 ? (
+              <Image source={{ uri: photoUri[0] }} style={styles.avatar} />
+            ) : (
+              <Text style={styles.profileText}>
+                {user?.userName?.charAt(0).toUpperCase()}
+              </Text>
+            )}
+          </View>
         </View>
 
         {/* Balance Card */}
@@ -314,6 +342,7 @@ type Styles = {
   balance: TextStyle;
   balanceRow: ViewStyle;
   profit: TextStyle;
+  avatar: ImageStyle;
   profitText: TextStyle;
   actions: ViewStyle;
   actionBtn: ViewStyle;
@@ -361,6 +390,16 @@ const styles = StyleSheet.create<Styles>({
     backgroundColor: "#1e293b",
     alignItems: "center",
     justifyContent: "center",
+  },
+  avatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#1e293b",
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 2,
+    borderColor: "#38bdf8",
   },
   profileText: {
     color: "#38bdf8",
