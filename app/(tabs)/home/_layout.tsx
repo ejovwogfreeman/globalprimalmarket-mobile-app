@@ -30,6 +30,8 @@ export default function HomeStackLayout() {
         options={{ title: "Transaction Details" }}
       />
       <Stack.Screen name="transactions" options={{ title: "Transactions" }} />
+      <Stack.Screen name="crypto" options={{ title: "Live Market Prices" }} />
+      <Stack.Screen name="cryptodetail" options={{ title: "Crypto Details" }} />
     </Stack>
   );
 }
