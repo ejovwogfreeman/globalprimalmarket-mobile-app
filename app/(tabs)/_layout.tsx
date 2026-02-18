@@ -1,4 +1,4 @@
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Tabs, useSegments } from "expo-router";
 import { View } from "react-native";
 
@@ -14,6 +14,7 @@ export default function TabsLayout() {
 
   const hideTabs =
     (segments[1] === "home" && segments.length > 2) ||
+    (segments[1] === "bot" && segments.length > 2) ||
     (segments[1] === "profile" && segments.length > 2) ||
     (segments[1] === "settings" && segments.length > 2);
 
@@ -53,6 +54,19 @@ export default function TabsLayout() {
           options={{
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="home-outline" size={size} color={color} />
+            ),
+          }}
+        />
+
+        <Tabs.Screen
+          name="bot"
+          options={{
+            tabBarIcon: ({ color, size }) => (
+              <MaterialCommunityIcons
+                name="robot-outline"
+                size={24}
+                color={color}
+              />
             ),
           }}
         />

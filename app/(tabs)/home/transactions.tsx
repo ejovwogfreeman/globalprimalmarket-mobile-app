@@ -65,10 +65,12 @@ export default function Transactions() {
                   style={[
                     styles.typeContainer,
                     tx.type === "deposit"
-                      ? { backgroundColor: "#22c55e" }
+                      ? { backgroundColor: "#22c55e" } // green
                       : tx.type === "withdrawal"
-                        ? { backgroundColor: "#f87171" }
-                        : { backgroundColor: "#38bdf8" },
+                        ? { backgroundColor: "#f87171" } // red
+                        : tx.type === "investment"
+                          ? { backgroundColor: "#38bdf8" } // gray
+                          : { backgroundColor: "#9ca3af" }, // blue for other types
                   ]}
                 >
                   <Text style={styles.type}>{tx.type.toUpperCase()}</Text>
@@ -85,7 +87,9 @@ export default function Transactions() {
                       ? { backgroundColor: "#22c55e22" }
                       : tx.status === "pending"
                         ? { backgroundColor: "#facc1522" }
-                        : { backgroundColor: "#ef444422" },
+                        : tx.status === "declined"
+                          ? { backgroundColor: "#ef444422" }
+                          : { backgroundColor: "#5544ef22" },
                   ]}
                 >
                   <Text
@@ -95,7 +99,9 @@ export default function Transactions() {
                         ? { color: "#22c55e" }
                         : tx.status === "pending"
                           ? { color: "#facc15" }
-                          : { color: "#ef4444" },
+                          : tx.status == "declined"
+                            ? { color: "#ef4444" }
+                            : { color: "#38bdf8" },
                     ]}
                   >
                     {tx.status.toUpperCase()}

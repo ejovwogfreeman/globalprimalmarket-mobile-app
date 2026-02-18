@@ -54,33 +54,76 @@ export default function TransactionScreen() {
   }
 
   return (
+    // <ScrollView
+    //   style={styles.container}
+    //   contentContainerStyle={{ padding: 20 }}
+    // >
+    //   <Row
+    //     label="Type"
+    //     value={transaction.type.toUpperCase()}
+    //     badge={
+    //       transaction.type === "deposit"
+    //         ? "#22c55e"
+    //         : transaction.type === "withdrawal"
+    //           ? "#f87171"
+    //           : "#38bdf8"
+    //     }
+    //   />
+    //   <Row label="Amount" value={`$${transaction.amount}`} />
+    //   <Row
+    //     label="Status"
+    //     value={transaction.status.toUpperCase()}
+    //     badge={
+    //       transaction.status === "approved"
+    //         ? "#22c55e"
+    //         : transaction.status === "pending"
+    //           ? "#facc15"
+    //           : "#ef4444"
+    //     }
+    //   />
+    //   <Row
+    //     label="Date"
+    //     value={new Date(transaction.createdAt).toLocaleString()}
+    //   />
+    // </ScrollView>
     <ScrollView
       style={styles.container}
       contentContainerStyle={{ padding: 20 }}
     >
+      {/* Type Row */}
       <Row
         label="Type"
         value={transaction.type.toUpperCase()}
         badge={
           transaction.type === "deposit"
-            ? "#22c55e"
+            ? "#22c55e" // green
             : transaction.type === "withdrawal"
-              ? "#f87171"
-              : "#38bdf8"
+              ? "#f87171" // red
+              : transaction.type === "investment"
+                ? "#38bdf8" // gray
+                : "#9ca3af" // blue fallback
         }
       />
+
+      {/* Amount Row */}
       <Row label="Amount" value={`$${transaction.amount}`} />
+
+      {/* Status Row */}
       <Row
         label="Status"
         value={transaction.status.toUpperCase()}
         badge={
           transaction.status === "approved"
-            ? "#22c55e"
+            ? "#22c55e" // green
             : transaction.status === "pending"
-              ? "#facc15"
-              : "#ef4444"
+              ? "#facc15" // yellow
+              : transaction.status === "declined"
+                ? "#ef4444" // gray
+                : "#38bdf8" // red for declined / other
         }
       />
+
+      {/* Date Row */}
       <Row
         label="Date"
         value={new Date(transaction.createdAt).toLocaleString()}

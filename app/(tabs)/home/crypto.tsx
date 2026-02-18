@@ -169,7 +169,10 @@ export default function AllCryptos() {
                       },
                     ]}
                   >
-                    {coin.price_change_percentage_24h.toFixed(2)}%
+                    {coin.current_price != null
+                      ? coin.current_price.toFixed(2)
+                      : "0.00"}
+                    %
                   </Text>
                 </View>
               </TouchableOpacity>

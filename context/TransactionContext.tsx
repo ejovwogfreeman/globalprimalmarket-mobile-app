@@ -1,7 +1,12 @@
 import React, { createContext, useContext, useState } from "react";
 import { Alert } from "react-native";
 
-type TransactionType = "deposit" | "withdrawal" | "investment";
+type TransactionType =
+  | "deposit"
+  | "withdrawal"
+  | "investment"
+  | "funding"
+  | "bot purchase";
 
 interface TransactionPayload {
   user: string;
