@@ -10,6 +10,54 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+// const PLANS = [
+//   {
+//     id: "starter",
+//     name: "Starter",
+//     price: "$50",
+//     roi: "10% ROI",
+//     duration: "7 Days",
+//     dailyReturnPercent: 10,
+//     durationDays: 7,
+//     maxReturnPercent: 7,
+//   },
+//   {
+//     id: "silver",
+//     name: "Silver",
+//     price: "$200",
+//     roi: "20% ROI",
+//     duration: "14 Days",
+//   },
+//   {
+//     id: "gold",
+//     name: "Gold",
+//     price: "$500",
+//     roi: "35% ROI",
+//     duration: "21 Days",
+//   },
+//   {
+//     id: "diamond",
+//     name: "Diamond",
+//     price: "$1,000",
+//     roi: "50% ROI",
+//     duration: "30 Days",
+//   },
+//   {
+//     id: "platinum",
+//     name: "Platinum",
+//     price: "$3,000",
+//     roi: "75% ROI",
+//     duration: "45 Days",
+//   },
+//   {
+//     id: "elite",
+//     name: "Elite",
+//     price: "$5,000",
+//     roi: "100% ROI",
+//     duration: "60 Days",
+//   },
+// ];
+
 const PLANS = [
   {
     id: "starter",
@@ -17,6 +65,9 @@ const PLANS = [
     price: "$50",
     roi: "10% ROI",
     duration: "7 Days",
+    dailyReturnPercent: Number((10 / 7).toFixed(3)), // 1.429%
+    durationDays: 7,
+    maxReturnPercent: 10,
   },
   {
     id: "silver",
@@ -24,6 +75,9 @@ const PLANS = [
     price: "$200",
     roi: "20% ROI",
     duration: "14 Days",
+    dailyReturnPercent: Number((20 / 14).toFixed(3)), // 1.429%
+    durationDays: 14,
+    maxReturnPercent: 20,
   },
   {
     id: "gold",
@@ -31,6 +85,9 @@ const PLANS = [
     price: "$500",
     roi: "35% ROI",
     duration: "21 Days",
+    dailyReturnPercent: Number((35 / 21).toFixed(3)), // 1.667%
+    durationDays: 21,
+    maxReturnPercent: 35,
   },
   {
     id: "diamond",
@@ -38,6 +95,9 @@ const PLANS = [
     price: "$1,000",
     roi: "50% ROI",
     duration: "30 Days",
+    dailyReturnPercent: Number((50 / 30).toFixed(3)), // 1.667%
+    durationDays: 30,
+    maxReturnPercent: 50,
   },
   {
     id: "platinum",
@@ -45,6 +105,9 @@ const PLANS = [
     price: "$3,000",
     roi: "75% ROI",
     duration: "45 Days",
+    dailyReturnPercent: Number((75 / 45).toFixed(3)), // 1.667%
+    durationDays: 45,
+    maxReturnPercent: 75,
   },
   {
     id: "elite",
@@ -52,6 +115,9 @@ const PLANS = [
     price: "$5,000",
     roi: "100% ROI",
     duration: "60 Days",
+    dailyReturnPercent: Number((100 / 60).toFixed(3)), // 1.667%
+    durationDays: 60,
+    maxReturnPercent: 100,
   },
 ];
 
@@ -89,7 +155,12 @@ export default function InvestPlan() {
               onPress={() =>
                 router.push({
                   pathname: "/home/invest",
-                  params: { plan: plan.id },
+                  params: {
+                    plan: plan.id,
+                    dailyReturnPercent: plan.dailyReturnPercent,
+                    durationDays: plan.durationDays,
+                    maxReturnPercent: plan.maxReturnPercent,
+                  },
                 })
               }
             >

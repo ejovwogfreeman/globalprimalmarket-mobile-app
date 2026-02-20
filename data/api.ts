@@ -81,6 +81,10 @@ export interface Transaction {
   amount: number;
   status: "pending" | "in progress" | "approved" | "declined";
   mode?: string;
+  plan?: string;
+  durationDays?: number;
+  dailyReturnPercent?: number;
+  maxReturnPercent?: number;
   wallet?: string;
   createdAt: string;
   token: string;

@@ -99,7 +99,8 @@ export default function AllCryptos() {
 
   /* ===================== UI ===================== */
   return (
-    <SafeAreaView style={styles.safe} edges={["top"]}>
+    // <SafeAreaView style={styles.safe} edges={["top"]}>
+    <SafeAreaView style={styles.safe} edges={[]}>
       <View style={styles.container}>
         {/* SEARCH BAR */}
         <View style={styles.searchBox}>

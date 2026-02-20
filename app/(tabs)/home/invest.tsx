@@ -41,6 +41,9 @@ export default function Invest() {
   const { user } = useUser();
 
   const initialPlan = (params.plan as string) || "starter";
+  const dailyReturnPercent = (params.dailyReturnPercent as string) || "";
+  const durationDays = (params.durationDays as string) || "";
+  const maxReturnPercent = (params.maxReturnPercent as string) || "";
   const [plan, setPlan] = useState(initialPlan);
   const [amountUSD, setAmountUSD] = useState(""); // USD input
   const [mode, setMode] = useState(CRYPTO_MODES[0].symbol); // default BTC
@@ -79,6 +82,9 @@ export default function Invest() {
         plan,
         mode,
         amount: amountInCrypto,
+        dailyReturnPercent,
+        durationDays,
+        maxReturnPercent,
       };
 
       console.log(payload);

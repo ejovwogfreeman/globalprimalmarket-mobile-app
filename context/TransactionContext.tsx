@@ -14,6 +14,9 @@ interface TransactionPayload {
   amount: number;
   mode: string;
   plan?: string;
+  durationDays?: number;
+  dailyReturnPercent?: number;
+  maxReturnPercent?: number;
 }
 
 interface TransactionContextType {

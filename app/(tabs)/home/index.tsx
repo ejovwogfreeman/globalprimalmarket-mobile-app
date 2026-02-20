@@ -30,9 +30,9 @@ export default function Home() {
   const [market, setMarket] = useState<MarketCoin[]>([]);
   const [loadingMarket, setLoadingMarket] = useState(true);
 
-  if (!user) {
-    return null; // or loader
-  }
+  // if (!user) {
+  //   return null; // or loader
+  // }
 
   const [photoUri, setPhotoUri] = useState<string[]>(
     user?.profilePicture ? user.profilePicture : [],
@@ -119,7 +119,8 @@ export default function Home() {
   }, []);
 
   /* ---------- BALANCE SELECT LOGIC ---------- */
-  const currencies = Object.entries(user?.balance || []); // [["BTC", 0.5], ["ETH", 2], ...]
+  // const currencies = Object.entries(user?.balance || []); // [["BTC", 0.5], ["ETH", 2], ...]
+  const currencies = user ? Object.entries(user.balance || {}) : [];
   const [selected, setSelected] = useState(
     currencies.find(([symbol]) => symbol.toUpperCase() === "BTC") ||
       currencies[0] || ["BTC", 0],
@@ -130,6 +131,10 @@ export default function Home() {
     setSelected([symbol, amount]);
     setShowDropdown(false);
   };
+
+  if (!user) {
+    return null; // or loader
+  }
 
   /* ===================== UI ===================== */
   return (

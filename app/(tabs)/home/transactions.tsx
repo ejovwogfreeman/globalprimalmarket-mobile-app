@@ -2,18 +2,21 @@ import { useUser } from "@/context/UserContext";
 import { getMyTransactions, Transaction } from "@/data/api";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
   ScrollView,
   StyleSheet,
   Text,
-  TextStyle,
   TouchableOpacity,
   View,
-  ViewStyle,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+type FilterOption = {
+  label: string;
+  value: string;
+};
 
 export default function Transactions() {
   const { user } = useUser();
@@ -21,7 +24,10 @@ export default function Transactions() {
 
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(false);
+  const [selectedFilter, setSelectedFilter] = useState<string>("all");
+  const [showDropdown, setShowDropdown] = useState(false);
 
+  /* ================= FETCH ================= */
   useEffect(() => {
     const token = user?.token;
     if (!token) return;
@@ -40,9 +46,62 @@ export default function Transactions() {
     fetchTransactions();
   }, [user?.token]);
 
+  /* ================= DYNAMIC FILTER OPTIONS ================= */
+  const filterOptions: FilterOption[] = useMemo(() => {
+    const uniqueTypes = Array.from(
+      new Set(transactions.map((tx) => tx.type?.toLowerCase())),
+    ).filter(Boolean);
+
+    const dynamicOptions = uniqueTypes.map((type) => ({
+      label: type.charAt(0).toUpperCase() + type.slice(1),
+      value: type,
+    }));
+
+    return [{ label: "All Transactions", value: "all" }, ...dynamicOptions];
+  }, [transactions]);
+
+  /* ================= FILTERED DATA ================= */
+  const filteredTransactions = useMemo(() => {
+    if (selectedFilter === "all") return transactions;
+
+    return transactions.filter(
+      (tx) => tx.type?.toLowerCase() === selectedFilter,
+    );
+  }, [transactions, selectedFilter]);
+
+  /* ================= UI ================= */
   return (
     <SafeAreaView style={styles.safe} edges={["bottom"]}>
       <StatusBar style="light" />
+
+      {/* FILTER DROPDOWN */}
+      <View style={styles.filterContainer}>
+        <TouchableOpacity
+          style={styles.filterButton}
+          onPress={() => setShowDropdown(!showDropdown)}
+        >
+          <Text style={styles.filterText}>
+            {filterOptions.find((f) => f.value === selectedFilter)?.label}
+          </Text>
+        </TouchableOpacity>
+
+        {showDropdown && (
+          <View style={styles.dropdown}>
+            {filterOptions.map((option) => (
+              <TouchableOpacity
+                key={option.value}
+                style={styles.dropdownItem}
+                onPress={() => {
+                  setSelectedFilter(option.value);
+                  setShowDropdown(false);
+                }}
+              >
+                <Text style={styles.dropdownText}>{option.label}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+      </View>
 
       {loading ? (
         <View style={styles.center}>
@@ -53,32 +112,35 @@ export default function Transactions() {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.container}
         >
-          {transactions.length === 0 && (
+          {filteredTransactions.length === 0 && (
             <Text style={styles.info}>No transactions found.</Text>
           )}
 
-          {transactions.map((tx) => (
+          {filteredTransactions.map((tx) => (
             <View key={tx._id} style={styles.card}>
-              {/* Type and Amount */}
+              {/* TYPE & AMOUNT */}
               <View style={[styles.row, { marginBottom: 8 }]}>
                 <View
                   style={[
                     styles.typeContainer,
                     tx.type === "deposit"
-                      ? { backgroundColor: "#22c55e" } // green
+                      ? { backgroundColor: "#22c55e" }
                       : tx.type === "withdrawal"
-                        ? { backgroundColor: "#f87171" } // red
+                        ? { backgroundColor: "#f87171" }
                         : tx.type === "investment"
-                          ? { backgroundColor: "#38bdf8" } // gray
-                          : { backgroundColor: "#9ca3af" }, // blue for other types
+                          ? { backgroundColor: "#38bdf8" }
+                          : { backgroundColor: "#9ca3af" },
                   ]}
                 >
                   <Text style={styles.type}>{tx.type.toUpperCase()}</Text>
                 </View>
-                <Text style={styles.amount}>${tx.amount}</Text>
+
+                <Text style={styles.amount}>
+                  {tx.amount} {tx.mode?.toUpperCase()}
+                </Text>
               </View>
 
-              {/* Status and Date */}
+              {/* STATUS & DATE */}
               <View style={styles.row}>
                 <View
                   style={[
@@ -99,7 +161,7 @@ export default function Transactions() {
                         ? { color: "#22c55e" }
                         : tx.status === "pending"
                           ? { color: "#facc15" }
-                          : tx.status == "declined"
+                          : tx.status === "declined"
                             ? { color: "#ef4444" }
                             : { color: "#38bdf8" },
                     ]}
@@ -107,12 +169,13 @@ export default function Transactions() {
                     {tx.status.toUpperCase()}
                   </Text>
                 </View>
+
                 <Text style={styles.date}>
                   {new Date(tx.createdAt).toLocaleDateString()}
                 </Text>
               </View>
 
-              {/* View Details Link */}
+              {/* DETAILS */}
               <TouchableOpacity
                 style={styles.linkContainer}
                 onPress={() =>
@@ -132,29 +195,10 @@ export default function Transactions() {
   );
 }
 
-type Styles = {
-  safe: ViewStyle;
-  container: ViewStyle;
-  center: ViewStyle;
-  title: TextStyle;
-  info: TextStyle;
-  card: ViewStyle;
-  row: ViewStyle;
-  typeContainer: ViewStyle;
-  type: TextStyle;
-  amount: TextStyle;
-  statusBadge: ViewStyle;
-  status: TextStyle;
-  date: TextStyle;
-  linkContainer: ViewStyle;
-  link: TextStyle;
-};
-
-const styles = StyleSheet.create<Styles>({
+const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: "#020617" },
   container: {
     paddingHorizontal: 20,
-    paddingTop: 10, // reduced top padding to move cards up
     paddingBottom: 40,
   },
   center: {
@@ -163,41 +207,56 @@ const styles = StyleSheet.create<Styles>({
     alignItems: "center",
     minHeight: 300,
   },
-
-  title: {
-    fontSize: 22,
-    fontWeight: "700",
-    color: "#f8fafc",
-    marginBottom: 16,
-  },
   info: { fontSize: 14, color: "#94a3b8" },
 
+  /* FILTER */
+  filterContainer: {
+    paddingHorizontal: 20,
+    paddingTop: 15,
+    paddingBottom: 15,
+    zIndex: 10,
+  },
+  filterButton: {
+    backgroundColor: "#111827",
+    paddingVertical: 12,
+    paddingHorizontal: 15,
+
+    borderRadius: 8,
+  },
+  filterText: { color: "#38bdf8", fontWeight: "600" },
+  dropdown: {
+    backgroundColor: "#111827",
+    marginTop: 5,
+    borderRadius: 8,
+    overflow: "hidden",
+  },
+  dropdownItem: {
+    paddingVertical: 12,
+    paddingHorizontal: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#1f2937",
+  },
+  dropdownText: { color: "#f8fafc" },
+
+  /* CARD */
   card: {
     backgroundColor: "#111827",
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.25,
-    shadowRadius: 6,
-    elevation: 6,
+    marginTop: 10,
   },
-
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
   },
-
   typeContainer: { paddingVertical: 4, paddingHorizontal: 8, borderRadius: 6 },
   type: { color: "#fff", fontWeight: "600" },
   amount: { color: "#f8fafc", fontWeight: "700", fontSize: 16 },
-
   statusBadge: { paddingVertical: 4, paddingHorizontal: 12, borderRadius: 12 },
   status: { fontWeight: "600", fontSize: 12 },
   date: { color: "#94a3b8", fontSize: 12 },
-
   linkContainer: { marginTop: 12 },
   link: { color: "#38bdf8", fontWeight: "600" },
 });
