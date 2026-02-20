@@ -1,6 +1,8 @@
 import { useUser } from "@/context/UserContext";
 import { createDeposit } from "@/data/api";
+import { Ionicons } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
+import * as Clipboard from "expo-clipboard";
 import * as ImagePicker from "expo-image-picker";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -72,6 +74,14 @@ export default function Deposit() {
 
   const { user } = useUser();
   const crypto = CRYPTOS[method];
+
+  const handleCopy = async () => {
+    await Clipboard.setStringAsync(crypto.address);
+    Alert.alert(
+      "Copied",
+      `${crypto.name} (${crypto.symbol}) Address copied to clipboard`,
+    );
+  };
 
   /* -------------------- PICK IMAGE -------------------- */
   const pickProof = async () => {
@@ -165,7 +175,16 @@ export default function Deposit() {
         {/* Wallet Card */}
         <View style={styles.card}>
           <Image source={crypto.image} style={styles.icon} />
-          <Text style={styles.address}>{crypto.address}</Text>
+          {/* <Text style={styles.address}>{crypto.address}</Text> */}
+          <View style={styles.addressRow}>
+            <Text style={styles.address} numberOfLines={1}>
+              {crypto.address}
+            </Text>
+
+            <TouchableOpacity onPress={handleCopy}>
+              <Ionicons name="copy-outline" size={20} color="#38bdf8" />
+            </TouchableOpacity>
+          </View>
 
           <View style={styles.qrBox}>
             <QRCode value={crypto.address} size={180} />
@@ -247,11 +266,18 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   icon: { width: 44, height: 44, marginBottom: 12 },
+  addressRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 8,
+    marginBottom: 16,
+  },
   address: {
     color: "#94a3b8",
     fontSize: 12,
     textAlign: "center",
-    marginBottom: 16,
+    marginRight: 10,
   },
   qrBox: {
     backgroundColor: "#ffffff",
