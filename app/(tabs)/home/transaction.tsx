@@ -152,7 +152,10 @@ export default function TransactionScreen() {
       {/* ===== EXTRA INFO FOR INVESTMENT / BOT PURCHASE ===== */}
       {isInvestment && (
         <>
-          <Row label="Plan" value={transaction.plan ?? "N/A"} />
+          <Row
+            label={transaction.type === "bot purchase" ? "Bot Name" : "Plan"}
+            value={transaction.plan ?? "N/A"}
+          />
           <Row label="Daily Return (%)" value={`${dailyReturnPercent}%`} />
           <Row label="Duration Days" value={`${durationDays} Days`} />
           <Row label="Max Return (%)" value={`${maxReturnPercent}%`} />
