@@ -10,54 +10,6 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-// const PLANS = [
-//   {
-//     id: "starter",
-//     name: "Starter",
-//     price: "$50",
-//     roi: "10% ROI",
-//     duration: "7 Days",
-//     dailyReturnPercent: 10,
-//     durationDays: 7,
-//     maxReturnPercent: 7,
-//   },
-//   {
-//     id: "silver",
-//     name: "Silver",
-//     price: "$200",
-//     roi: "20% ROI",
-//     duration: "14 Days",
-//   },
-//   {
-//     id: "gold",
-//     name: "Gold",
-//     price: "$500",
-//     roi: "35% ROI",
-//     duration: "21 Days",
-//   },
-//   {
-//     id: "diamond",
-//     name: "Diamond",
-//     price: "$1,000",
-//     roi: "50% ROI",
-//     duration: "30 Days",
-//   },
-//   {
-//     id: "platinum",
-//     name: "Platinum",
-//     price: "$3,000",
-//     roi: "75% ROI",
-//     duration: "45 Days",
-//   },
-//   {
-//     id: "elite",
-//     name: "Elite",
-//     price: "$5,000",
-//     roi: "100% ROI",
-//     duration: "60 Days",
-//   },
-// ];
-
 const PLANS = [
   {
     id: "starter",

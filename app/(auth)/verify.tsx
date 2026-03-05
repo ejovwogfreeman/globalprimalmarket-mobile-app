@@ -130,9 +130,9 @@ export default function Verify() {
     <View style={styles.container}>
       <StatusBar barStyle="light-content" />
 
-      <Text style={styles.title}>Enter Verification Code</Text>
+      <Text style={styles.title}>✅ Enter Verification Code</Text>
       <Text style={styles.subtitle}>
-        Please enter the 6-digit code sent to you
+        Please enter the 6-digit code sent to {email}
       </Text>
 
       <View style={styles.card}>

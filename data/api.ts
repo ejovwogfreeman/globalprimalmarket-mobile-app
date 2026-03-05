@@ -546,3 +546,34 @@ export const purchaseBot = async (
     };
   }
 };
+
+// -----------------------------
+// Claim Bonus
+// -----------------------------
+export const claimBonus = async (
+  token: string,
+  transactionId: string,
+): Promise<TransactionResponse> => {
+  try {
+    const response: AxiosResponse<TransactionResponse> = await api.put(
+      `/transactions/${transactionId}/claim-bonus`,
+      {}, // No body needed unless backend requires additional info
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      },
+    );
+
+    return response.data;
+  } catch (error: any) {
+    return {
+      success: false,
+      message:
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to claim bonus",
+    };
+  }
+};

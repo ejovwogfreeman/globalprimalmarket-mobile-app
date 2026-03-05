@@ -75,8 +75,8 @@ export default function Home() {
 
   const formatCurrency = (amount?: number) =>
     new Intl.NumberFormat("en-US", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
+      minimumFractionDigits: 5,
+      maximumFractionDigits: 5,
     }).format(amount ?? 0);
 
   /* ---------- Fetch real-time crypto ---------- */
@@ -254,7 +254,7 @@ export default function Home() {
             style={{ flexDirection: "row", alignItems: "center" }}
             onPress={() => router.push("/home/crypto")}
           >
-            <Text style={styles.viewAll}>View All Cryoto</Text>
+            <Text style={styles.viewAll}>View All Crypto</Text>
             <Ionicons name="chevron-forward" size={14} color="#38bdf8" />
           </TouchableOpacity>
         </View>

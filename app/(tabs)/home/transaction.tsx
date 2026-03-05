@@ -1,5 +1,5 @@
 import { useUser } from "@/context/UserContext";
-import { getTransactionById, Transaction } from "@/data/api";
+import { claimBonus, getTransactionById, Transaction } from "@/data/api";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 import {
@@ -73,6 +73,40 @@ export default function TransactionScreen() {
       return () => clearInterval(interval);
     }
   }, [transaction]);
+
+  const handleClaimBonus = async () => {
+    if (!user?.token || !transaction?._id) return;
+
+    try {
+      // Optional: show loading
+      setCountdown("Claiming...");
+
+      const res = await claimBonus(user.token, transaction._id);
+
+      if (res.success) {
+        Alert.alert(
+          "Bonus Claimed",
+          "Your bonus has been successfully claimed!",
+        );
+        router.replace("/home");
+        // Optionally, refresh transaction info
+        const updatedTransaction = await getTransactionById(
+          user.token,
+          transaction._id,
+        );
+        if (updatedTransaction.success) {
+          setTransaction(updatedTransaction.transaction ?? null);
+        }
+      } else {
+        Alert.alert("Error", res.message || "Failed to claim bonus");
+        setCountdown("Matured"); // revert countdown
+      }
+    } catch (err) {
+      console.error(err);
+      Alert.alert("Error", "Something went wrong while claiming bonus");
+      setCountdown("Matured");
+    }
+  };
 
   if (loading) {
     return (
@@ -157,7 +191,7 @@ export default function TransactionScreen() {
             value={transaction.plan ?? "N/A"}
           />
           <Row label="Daily Return (%)" value={`${dailyReturnPercent}%`} />
-          <Row label="Duration Days" value={`${durationDays} Days`} />
+          <Row label="Duration (Days)" value={`${durationDays} Days`} />
           <Row label="Max Return (%)" value={`${maxReturnPercent}%`} />
           <Row label="Countdown" value={countdown} />
 
@@ -165,14 +199,7 @@ export default function TransactionScreen() {
           {countdown === "Matured" && (
             <TouchableOpacity
               style={styles.claimButton}
-              onPress={() => {
-                Alert.alert(
-                  "Bonus Claimed",
-                  "Your bonus has been successfully claimed!",
-                );
-                router.replace("/home");
-                // TODO: call your backend API to mark bonus as claimed
-              }}
+              onPress={handleClaimBonus} // <-- call the function here
             >
               <Text style={styles.claimButtonText}>Claim Bonus</Text>
             </TouchableOpacity>
