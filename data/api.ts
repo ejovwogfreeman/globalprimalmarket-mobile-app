@@ -4,6 +4,7 @@ import axios, { AxiosResponse } from "axios";
 // -----------------------------
 // Base API Configuration
 // -----------------------------
+
 const API_BASE_URL = "https://globalprimalmarket-api.vercel.app/api";
 
 const api = axios.create({

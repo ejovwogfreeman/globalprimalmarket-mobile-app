@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "globalprimalmarket",
-    "slug": "globalprimalmarket",
+    "name": "Global Primal Wallet",
+    "slug": "Global Primal Wallet",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "globalprimalmarket",
+    "scheme": "Global Primal Wallet",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
@@ -25,7 +25,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.ejovwogfreeman.globalprimalmarket"
+      "package": "com.ejovwogfreeman.Global Primal Wallet"
     },
     "web": {
       "output": "static",
