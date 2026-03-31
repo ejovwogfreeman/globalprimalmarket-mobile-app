@@ -35,7 +35,7 @@ export default function HelpSupport() {
     {
       question: "Who can I contact for support?",
       answer:
-        "You can reach our support team via email at support@example.com or call us at +123 456 7890.",
+        "You can reach our support team via email at support@globalprimalmarket.com or call us at +1 904 310 2851.",
     },
   ];
 
@@ -47,8 +47,13 @@ export default function HelpSupport() {
         {/* Contact Us */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Contact Us</Text>
-          <Text style={styles.contactText}>📧 Email: support@example.com</Text>
-          <Text style={styles.contactText}>📞 Phone: +123 456 7890</Text>
+          <Text style={styles.contactText}>
+            📧 Email: support@globalprimalmarket.com
+          </Text>
+          <Text style={styles.contactText}>📞 Phone: +1 904 310 2851</Text>
+          <Text style={styles.contactText}>
+            📍 Address: 2441 Old Cypress Creek Rd
+          </Text>
         </View>
 
         {/* FAQ */}
