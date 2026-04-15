@@ -1,4 +1,5 @@
 import { useUser } from "@/context/UserContext";
+import { CRYPTO_MODES } from "@/data/crypto";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -14,6 +15,11 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 /* ===================== TYPES ===================== */
+
+type BalanceMap = {
+  [key: string]: number;
+};
+
 type MarketCoin = {
   id: string;
   name: string;
@@ -23,22 +29,29 @@ type MarketCoin = {
   price_change_percentage_24h: number;
 };
 
+type UserType = {
+  userName: string;
+  profilePicture?: string | string[];
+  balance: BalanceMap;
+};
+
 /* ===================== SCREEN ===================== */
+
 export default function Home() {
-  const { user } = useUser();
+  const { user } = useUser() as { user: UserType | null };
   const router = useRouter();
+
   const [market, setMarket] = useState<MarketCoin[]>([]);
   const [loadingMarket, setLoadingMarket] = useState(true);
 
-  // if (!user) {
-  //   return null; // or loader
-  // }
+  const [photoUri, setPhotoUri] = useState<string[]>([]);
 
-  const [photoUri, setPhotoUri] = useState<string[]>(
-    user?.profilePicture ? user.profilePicture : [],
-  );
+  const [selectedCoin, setSelectedCoin] = useState<string>("usdt");
+  const [showDropdown, setShowDropdown] = useState<boolean>(false);
 
-  React.useEffect(() => {
+  const balances: BalanceMap = user?.balance || {};
+
+  useEffect(() => {
     if (user?.profilePicture) {
       setPhotoUri(
         Array.isArray(user.profilePicture)
@@ -48,11 +61,8 @@ export default function Home() {
     }
   }, [user]);
 
-  useEffect(() => {
-    // console.log("Logged-in user:", user); // ✅ check the user
-  }, [user]);
-
   /* ---------- Helpers ---------- */
+
   const getGreeting = () => {
     const hour = new Date().getHours();
     if (hour < 12) return "Good morning";
@@ -62,8 +72,7 @@ export default function Home() {
   };
 
   const getFormattedDateTime = () => {
-    const now = new Date();
-    return now.toLocaleString("en-US", {
+    return new Date().toLocaleString("en-US", {
       weekday: "long",
       day: "numeric",
       month: "long",
@@ -75,37 +84,29 @@ export default function Home() {
 
   const formatCurrency = (amount?: number) =>
     new Intl.NumberFormat("en-US", {
-      minimumFractionDigits: 5,
-      maximumFractionDigits: 5,
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
     }).format(amount ?? 0);
 
-  /* ---------- Fetch real-time crypto ---------- */
+  /* ---------- MARKET ---------- */
+
   const lastMarketRef = useRef<MarketCoin[]>([]);
 
   const fetchMarket = async () => {
     try {
       const res = await fetch(
-        "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=10&page=1&sparkline=false",
+        "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&per_page=10&page=1",
       );
 
-      const data: any = await res.json();
-
-      if (data?.status?.error_code === 429) {
-        // Use last successful data
-        setMarket(lastMarketRef.current);
-        return;
-      }
+      const data = await res.json();
 
       if (Array.isArray(data)) {
         setMarket(data);
-        // Save successful data for fallback
         lastMarketRef.current = data;
       } else {
-        console.log("Unexpected API response:", data);
         setMarket(lastMarketRef.current);
       }
-    } catch (err) {
-      console.log("Market fetch error — using last market data:", err);
+    } catch {
       setMarket(lastMarketRef.current);
     } finally {
       setLoadingMarket(false);
@@ -118,27 +119,43 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
-  /* ---------- BALANCE SELECT LOGIC ---------- */
-  // const currencies = Object.entries(user?.balance || []); // [["BTC", 0.5], ["ETH", 2], ...]
-  const currencies = user ? Object.entries(user.balance || {}) : [];
-  const [selected, setSelected] = useState(
-    currencies.find(([symbol]) => symbol.toUpperCase() === "BTC") ||
-      currencies[0] || ["BTC", 0],
-  );
-  const [showDropdown, setShowDropdown] = useState(false);
+  /* ---------- BALANCE LOGIC ---------- */
 
-  const handleSelect = (symbol: string, amount: number) => {
-    setSelected([symbol, amount]);
+  const totalUSDT = Object.keys(balances).reduce((sum, coin) => {
+    const crypto = CRYPTO_MODES.find((c) => c.symbol === coin);
+    const amount = Number(balances[coin]) || 0;
+
+    if (coin === "usdt") return sum + amount;
+    if (!crypto) return sum;
+
+    return sum + amount * crypto.rate;
+  }, 0);
+
+  const displayAmount =
+    selectedCoin === "usdt" ? totalUSDT : Number(balances[selectedCoin]) || 0;
+
+  const crypto = CRYPTO_MODES.find((c) => c.symbol === selectedCoin);
+
+  const selectedUsdtValue =
+    selectedCoin === "usdt"
+      ? totalUSDT
+      : crypto
+        ? Number(balances[selectedCoin] || 0) * crypto.rate
+        : 0;
+
+  const allCurrencies = ["usdt", ...Object.keys(balances)];
+
+  const handleSelect = (symbol: string) => {
+    setSelectedCoin(symbol);
     setShowDropdown(false);
   };
 
-  if (!user) {
-    return null; // or loader
-  }
+  if (!user) return null;
 
   /* ===================== UI ===================== */
+
   return (
-    <SafeAreaView style={styles.safe} edges={["top"]}>
+    <SafeAreaView style={styles.safe}>
       <StatusBar style="light" />
 
       <ScrollView contentContainerStyle={styles.container}>
@@ -151,11 +168,11 @@ export default function Home() {
           </View>
 
           <View style={styles.profile}>
-            {photoUri && photoUri.length > 0 ? (
+            {photoUri.length > 0 ? (
               <Image source={{ uri: photoUri[0] }} style={styles.avatar} />
             ) : (
               <Text style={styles.profileText}>
-                {user?.userName?.charAt(0).toUpperCase()}
+                {user.userName.charAt(0).toUpperCase()}
               </Text>
             )}
           </View>
@@ -163,9 +180,12 @@ export default function Home() {
 
         {/* BALANCE */}
         <View style={[styles.balanceCard, { position: "relative" }]}>
-          <Text style={styles.balanceLabel}>Portfolio Balance</Text>
+          <Text style={styles.balanceLabel}>
+            {selectedCoin === "usdt"
+              ? "TOTAL PORTFOLIO BALANCE"
+              : `${selectedCoin.toUpperCase()} BALANCE`}
+          </Text>
 
-          {/* SELECTED BALANCE DISPLAY */}
           <TouchableOpacity
             onPress={() => setShowDropdown(!showDropdown)}
             style={{
@@ -175,11 +195,13 @@ export default function Home() {
             }}
           >
             <Text style={{ fontSize: 32, fontWeight: "700", color: "#f8fafc" }}>
-              {formatCurrency(Number(selected[1])) || 0}
+              {formatCurrency(displayAmount)}
             </Text>
-            <Text style={{ fontSize: 16, color: "#f8fafc", marginLeft: 6 }}>
-              {selected[0].toUpperCase()}
+
+            <Text style={{ marginLeft: 6, color: "#f8fafc" }}>
+              {selectedCoin.toUpperCase()}
             </Text>
+
             <Ionicons
               name={showDropdown ? "caret-up-outline" : "caret-down-outline"}
               size={18}
@@ -188,34 +210,47 @@ export default function Home() {
             />
           </TouchableOpacity>
 
-          {/* DROPDOWN - absolute overlay */}
-          {showDropdown && currencies.length > 0 && (
+          <Text style={{ color: "#94a3b8", marginTop: 4 }}>
+            ≈ {formatCurrency(selectedUsdtValue)} USDT
+          </Text>
+
+          {/* DROPDOWN */}
+          {showDropdown && (
             <View
               style={{
                 position: "absolute",
-                top: 80, // adjust based on balance card padding + selected row height
+                top: 80,
                 left: 50,
-                right: 0,
                 backgroundColor: "#1e293b",
                 borderWidth: 1,
                 borderColor: "#38bdf8",
                 borderRadius: 8,
-                width: 200,
+                width: 300,
                 padding: 6,
-                zIndex: 9999, // bring above everything
+                zIndex: 9999,
               }}
             >
-              {currencies.map(([symbol, amount]) => (
-                <TouchableOpacity
-                  key={symbol}
-                  onPress={() => handleSelect(symbol, Number(amount))}
-                  style={{ paddingVertical: 6 }}
-                >
-                  <Text style={{ color: "#f8fafc", fontSize: 16 }}>
-                    {formatCurrency(Number(amount)) || 0} {symbol.toUpperCase()}
-                  </Text>
-                </TouchableOpacity>
-              ))}
+              {allCurrencies.map((symbol) => {
+                const isUSDT = symbol === "usdt";
+
+                const amount = isUSDT
+                  ? totalUSDT
+                  : Number(balances[symbol]) || 0;
+
+                return (
+                  <TouchableOpacity
+                    key={symbol}
+                    onPress={() => handleSelect(symbol)}
+                    style={{ paddingVertical: 6 }}
+                  >
+                    <Text style={{ color: "#f8fafc" }}>
+                      {symbol === "usdt"
+                        ? `USDT (TOTAL) — ${formatCurrency(amount)} USDT`
+                        : `${symbol.toUpperCase()} — ${formatCurrency(amount)} ${symbol.toUpperCase()}`}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
             </View>
           )}
 

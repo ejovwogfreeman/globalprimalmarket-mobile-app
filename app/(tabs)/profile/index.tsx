@@ -1,4 +1,5 @@
 import { useUser } from "@/context/UserContext";
+import { CRYPTO_MODES } from "@/data/crypto";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -87,11 +88,165 @@ export default function Profile() {
             label="Verified"
             value={<VerifiedBadge verified={user.isVerified} />}
           />
-          <ProfileRow
+          {/* <ProfileRow
             label="Balance"
             value={`$${user.balance.toLocaleString()}.00`}
             isLast={true}
-          />
+          /> */}
+          <View style={{ marginTop: 10 }}>
+            <Text
+              style={{
+                fontSize: 12,
+
+                color: "#94a3b8",
+                marginBottom: 10,
+              }}
+            >
+              Balances:
+            </Text>
+
+            {user?.balance &&
+              (() => {
+                const balances = user.balance;
+
+                // ✅ TOTAL USDT
+                const totalUSDT = Object.entries(balances).reduce(
+                  (sum, [symbol, amount]) => {
+                    const crypto = CRYPTO_MODES.find(
+                      (c) => c.symbol === symbol,
+                    );
+
+                    const value = Number(amount) || 0;
+
+                    if (symbol === "usdt") return sum + value;
+                    if (!crypto) return sum;
+
+                    return sum + value * crypto.rate;
+                  },
+                  0,
+                );
+
+                return (
+                  <>
+                    {/* ✅ TOTAL (TOP) */}
+                    <View
+                      style={{
+                        backgroundColor: "#222c44",
+                        padding: 16,
+                        borderRadius: 12,
+                        marginBottom: 12,
+                      }}
+                    >
+                      <Text
+                        style={{
+                          color: "#94a3b8",
+                          marginBottom: 4,
+                          fontSize: 12,
+                        }}
+                      >
+                        TOTAL BALANCE
+                      </Text>
+
+                      <View
+                        style={{ flexDirection: "row", alignItems: "baseline" }}
+                      >
+                        <Text
+                          style={{
+                            color: "#f8fafc",
+                            fontSize: 20,
+                            fontWeight: "700",
+                          }}
+                        >
+                          {totalUSDT.toLocaleString("en-US", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}
+                        </Text>
+
+                        <Text style={{ color: "#94a3b8", marginLeft: 4 }}>
+                          USDT
+                        </Text>
+                      </View>
+                    </View>
+
+                    {/* ✅ GRID */}
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        flexWrap: "wrap",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      {Object.entries(balances).map(([symbol, amount]) => {
+                        const crypto = CRYPTO_MODES.find(
+                          (c) => c.symbol === symbol,
+                        );
+
+                        const value = Number(amount) || 0;
+
+                        const usdtValue =
+                          symbol === "usdt"
+                            ? value
+                            : crypto
+                              ? value * crypto.rate
+                              : 0;
+
+                        return (
+                          <View
+                            key={symbol}
+                            style={{
+                              width: "48%",
+                              backgroundColor: "#222c44",
+                              padding: 12,
+                              borderRadius: 10,
+                              marginBottom: 10,
+                            }}
+                          >
+                            <View
+                              style={{
+                                flexDirection: "row",
+                                alignItems: "baseline",
+                              }}
+                            >
+                              <Text
+                                style={{
+                                  color: "#f8fafc",
+                                  fontWeight: "700",
+                                }}
+                              >
+                                {value.toLocaleString("en-US", {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                })}
+                              </Text>
+
+                              <Text style={{ color: "#94a3b8", marginLeft: 4 }}>
+                                {symbol.toUpperCase()}
+                              </Text>
+                            </View>
+
+                            <Text
+                              style={{
+                                color: "#757C86",
+                                marginTop: 4,
+                                fontSize: 12,
+                              }}
+                            >
+                              ≈{" "}
+                              {usdtValue.toLocaleString("en-US", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })}{" "}
+                              USDT
+                            </Text>
+                          </View>
+                        );
+                      })}
+                    </View>
+                  </>
+                );
+              })()}
+          </View>
         </View>
 
         {/* Button */}
