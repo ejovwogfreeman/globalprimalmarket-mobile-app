@@ -93,6 +93,14 @@ export default function Profile() {
             value={`$${user.balance.toLocaleString()}.00`}
             isLast={true}
           /> */}
+          <ProfileRow
+            label="Date Joined"
+            value={new Date(user.createdAt).toLocaleDateString("en-GB", {
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+            })}
+          />
           <View style={{ marginTop: 10 }}>
             <Text
               style={{
@@ -390,7 +398,7 @@ const styles = StyleSheet.create<Styles>({
     borderRadius: 16,
     padding: 16,
     paddingTop: 20,
-    paddingBottom: 0,
+    paddingBottom: 10,
     marginBottom: 20,
   },
   row: {

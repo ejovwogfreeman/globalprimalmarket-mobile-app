@@ -12,7 +12,7 @@ export interface User {
   isVerified: boolean;
   balance: number;
   role: string;
-  createdAt?: string;
+  createdAt: string;
   token?: string;
   profilePicture?: any;
 }
