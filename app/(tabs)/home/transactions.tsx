@@ -136,7 +136,11 @@ export default function Transactions() {
                 </View>
 
                 <Text style={styles.amount}>
-                  {tx.amount} {tx.mode?.toUpperCase()}
+                  {tx.amount.toLocaleString("en-US", {
+                    minimumFractionDigits: 5,
+                    maximumFractionDigits: 5,
+                  })}{" "}
+                  {tx.mode?.toUpperCase()}
                 </Text>
               </View>
 
