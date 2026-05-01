@@ -153,6 +153,11 @@ export interface BotPurchaseResponse {
   transaction?: any;
 }
 
+export interface DeleteAccount {
+  success: boolean;
+  message: string;
+}
+
 // -----------------------------
 // API Functions
 // -----------------------------
@@ -575,6 +580,36 @@ export const claimBonus = async (
         error.response?.data?.message ||
         error.message ||
         "Failed to claim bonus",
+    };
+  }
+};
+
+export const deleteAccount = async (
+  token: string,
+  password: string,
+): Promise<any> => {
+  try {
+    const response: AxiosResponse<DeleteAccount> = await api.delete(
+      `/user/delete-account`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        data: {
+          password, // 👈 DELETE requests send body inside "data"
+        },
+      },
+    );
+
+    return response.data;
+  } catch (error: any) {
+    return {
+      success: false,
+      message:
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to delete account",
     };
   }
 };

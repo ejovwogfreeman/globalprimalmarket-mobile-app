@@ -21,6 +21,14 @@ export default function SettingsStackLayout() {
         options={{ title: "Privacy & Policy" }}
       />
       <Stack.Screen name="security" options={{ title: "Security" }} />
+      <Stack.Screen
+        name="deleteaccount"
+        options={{ headerShown: false, title: "" }}
+      />
+      <Stack.Screen
+        name="deleteaccountsuccess"
+        options={{ headerShown: false, title: "" }}
+      />
     </Stack>
   );
 }

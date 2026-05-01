@@ -84,7 +84,8 @@ export default function HelpSupport() {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: "#020617", // dark background
+    // backgroundColor: "#020617", // dark background
+    backgroundColor: "red", // dark background
   },
   container: {
     padding: 24,
