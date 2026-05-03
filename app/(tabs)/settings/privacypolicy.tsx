@@ -1,5 +1,5 @@
 import React from "react";
-import { ScrollView, StyleSheet, Text } from "react-native";
+import { ScrollView, StyleSheet, Text, Linking } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function PrivacyPolicy() {
@@ -13,7 +13,16 @@ export default function PrivacyPolicy() {
           transactions and data are securely stored.
         </Text>
         <Text style={styles.text}>
-          For full policy details, please visit our website.
+          For full policy details,{" "}
+          <Text
+            style={{ color: "#00b4d8", textDecorationLine: "underline" }}
+            onPress={() =>
+              Linking.openURL("https://globatrixprime.com/privacy-policy")
+            }
+          >
+            visit our privacy policy page on our website
+          </Text>
+          .
         </Text>
       </ScrollView>
     </SafeAreaView>
